@@ -153,8 +153,7 @@ pub mod pyo3_impl {
         }
 
         pub fn stop(&self) {
-            let stopped = self.inner.stopped.clone();
-            if let Ok(mut s) = stopped.try_lock() {
+            if let Ok(mut s) = self.inner.stopped.try_lock() {
                 *s = true;
             }
         }
