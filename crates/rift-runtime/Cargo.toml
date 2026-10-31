@@ -24,5 +24,5 @@ tokio-tungstenite = { version = "0.30", features = ["native-tls"] }
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
-zstd = "0.13"
+zstd = "0.14"
 tracing = "0.1"
