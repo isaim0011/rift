@@ -77,7 +77,7 @@ pub struct EventSender {
 }
 
 impl EventSender {
-    /// Send an event according to the channel's configured [`EventBufferPolicy`].
+    /// Send an event according to the channel's configured [`EventBufferPolicy`](crate::EventBufferPolicy).
     pub fn send(&self, event: Event) -> Result<(), EventSendError<Event>> {
         match &self.inner {
             SenderInner::Queue(shared) => {

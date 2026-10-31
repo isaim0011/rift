@@ -889,11 +889,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "rift"
+name = "rift-cache"
+version = "0.1.0"
+dependencies = [
+ "rift-discord-core",
+ "rift-model",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "rift-discord"
 version = "0.1.0"
 dependencies = [
  "rift-cache",
- "rift-core",
+ "rift-discord-core",
  "rift-gateway",
  "rift-http",
  "rift-model",
@@ -906,24 +916,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "rift-cache"
-version = "0.1.0"
-dependencies = [
- "rift-core",
- "rift-model",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "rift-core"
+name = "rift-discord-core"
 version = "0.1.0"
 
 [[package]]
 name = "rift-gateway"
 version = "0.1.0"
 dependencies = [
- "rift-core",
+ "rift-discord-core",
 ]
 
 [[package]]
@@ -937,7 +937,7 @@ dependencies = [
 name = "rift-model"
 version = "0.1.0"
 dependencies = [
- "rift-core",
+ "rift-discord-core",
  "serde",
  "serde_json",
 ]
@@ -947,9 +947,9 @@ name = "rift-py"
 version = "0.0.1"
 dependencies = [
  "pyo3",
- "rift",
  "rift-cache",
- "rift-core",
+ "rift-discord",
+ "rift-discord-core",
  "rift-gateway",
  "rift-http",
  "rift-model",
@@ -964,7 +964,7 @@ name = "rift-rest"
 version = "0.1.0"
 dependencies = [
  "reqwest",
- "rift-core",
+ "rift-discord-core",
  "rift-gateway",
  "rift-http",
  "serde",
@@ -977,7 +977,7 @@ name = "rift-runtime"
 version = "0.1.0"
 dependencies = [
  "futures-util",
- "rift-core",
+ "rift-discord-core",
  "rift-gateway",
  "serde",
  "serde_json",

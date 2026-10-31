@@ -11,13 +11,13 @@ name = "_rift"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-rift-core = { path = "../../crates/rift-core" }
+rift-core = { package = "rift-discord-core", path = "../../crates/rift-core" }
 rift-http = { path = "../../crates/rift-http" }
 rift-gateway = { path = "../../crates/rift-gateway" }
 rift-model = { path = "../../crates/rift-model" }
 rift-cache = { path = "../../crates/rift-cache" }
 rift-rest = { path = "../../crates/rift-rest" }
-rift = { path = "../../crates/rift" }
+rift = { package = "rift-discord", path = "../../crates/rift" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync"] }

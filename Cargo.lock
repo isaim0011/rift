@@ -1078,24 +1078,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rift"
-version = "0.1.0"
-dependencies = [
- "rift-cache",
- "rift-core",
- "rift-gateway",
- "rift-http",
- "rift-model",
- "rift-rest",
- "rift-runtime",
- "rift-voice",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "rift-bench"
 version = "0.1.0"
 dependencies = [
@@ -1105,7 +1087,7 @@ dependencies = [
  "libc",
  "regex",
  "rift-cache",
- "rift-core",
+ "rift-discord-core",
  "rift-gateway",
  "rift-http",
  "rift-model",
@@ -1122,15 +1104,11 @@ dependencies = [
 name = "rift-cache"
 version = "0.1.0"
 dependencies = [
- "rift-core",
+ "rift-discord-core",
  "rift-model",
  "serde",
  "serde_json",
 ]
-
-[[package]]
-name = "rift-core"
-version = "0.1.0"
 
 [[package]]
 name = "rift-coverage"
@@ -1140,10 +1118,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "rift-discord"
+version = "0.1.0"
+dependencies = [
+ "rift-cache",
+ "rift-discord-core",
+ "rift-gateway",
+ "rift-http",
+ "rift-model",
+ "rift-rest",
+ "rift-runtime",
+ "rift-voice",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "rift-discord-core"
+version = "0.1.0"
+
+[[package]]
 name = "rift-gateway"
 version = "0.1.0"
 dependencies = [
- "rift-core",
+ "rift-discord-core",
 ]
 
 [[package]]
@@ -1157,7 +1157,7 @@ dependencies = [
 name = "rift-model"
 version = "0.1.0"
 dependencies = [
- "rift-core",
+ "rift-discord-core",
  "serde",
  "serde_json",
 ]
@@ -1167,7 +1167,7 @@ name = "rift-rest"
 version = "0.1.0"
 dependencies = [
  "reqwest",
- "rift-core",
+ "rift-discord-core",
  "rift-gateway",
  "rift-http",
  "serde",
@@ -1180,7 +1180,7 @@ name = "rift-runtime"
 version = "0.1.0"
 dependencies = [
  "futures-util",
- "rift-core",
+ "rift-discord-core",
  "rift-gateway",
  "serde",
  "serde_json",
@@ -1194,7 +1194,7 @@ dependencies = [
 name = "rift-voice"
 version = "0.1.0"
 dependencies = [
- "rift-core",
+ "rift-discord-core",
  "serde",
  "serde_json",
  "tokio",
