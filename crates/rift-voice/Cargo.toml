@@ -1,0 +1,23 @@
+[package]
+name = "rift-voice"
+description = "Deterministic sans-I/O Discord Voice Gateway v8 and UDP framing."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/rift-voice"
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+publish = true
+
+[dependencies]
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
+tokio = { version = "1", features = ["net", "rt", "sync", "time"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }

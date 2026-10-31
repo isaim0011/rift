@@ -1,0 +1,289 @@
+# Routes rift implements, one `METHOD /path` per line. Param names don't matter.
+# Keep this in sync when you add an endpoint; `rift-coverage --strict` flags
+# routes here that Discord's spec doesn't list (typos, removals).
+
+# gateway
+GET    /gateway/bot
+
+# messages (crates/rift-rest/src/message.rs)
+POST   /channels/{channel_id}/messages
+PATCH  /channels/{channel_id}/messages/{message_id}
+DELETE /channels/{channel_id}/messages/{message_id}
+PUT    /channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me
+
+# interactions (crates/rift-rest/src/interaction.rs)
+POST   /interactions/{interaction_id}/{interaction_token}/callback
+PATCH  /webhooks/{application_id}/{interaction_token}/messages/@original
+DELETE /webhooks/{application_id}/{interaction_token}/messages/@original
+POST   /webhooks/{application_id}/{interaction_token}
+PATCH  /webhooks/{application_id}/{interaction_token}/messages/{message_id}
+DELETE /webhooks/{application_id}/{interaction_token}/messages/{message_id}
+
+# application commands (crates/rift-rest/src/command.rs)
+PUT    /applications/{application_id}/commands
+PUT    /applications/{application_id}/guilds/{guild_id}/commands
+POST   /applications/{application_id}/commands
+POST   /applications/{application_id}/guilds/{guild_id}/commands
+GET    /applications/{application_id}/commands
+GET    /applications/{application_id}/guilds/{guild_id}/commands
+DELETE /applications/{application_id}/commands/{command_id}
+DELETE /applications/{application_id}/guilds/{guild_id}/commands/{command_id}
+
+# channels (crates/rift-rest/src/channel.rs)
+GET    /channels/{channel_id}
+PATCH  /channels/{channel_id}
+DELETE /channels/{channel_id}
+GET    /channels/{channel_id}/messages
+GET    /channels/{channel_id}/messages/{message_id}
+POST   /channels/{channel_id}/messages/{message_id}/crosspost
+DELETE /channels/{channel_id}/messages/{message_id}/reactions
+DELETE /channels/{channel_id}/messages/{message_id}/reactions/{emoji}
+DELETE /channels/{channel_id}/messages/{message_id}/reactions/{emoji}/{user_id}
+GET    /channels/{channel_id}/messages/{message_id}/reactions/{emoji}
+GET    /channels/{channel_id}/pins
+PUT    /channels/{channel_id}/pins/{message_id}
+DELETE /channels/{channel_id}/pins/{message_id}
+POST   /channels/{channel_id}/typing
+PUT    /channels/{channel_id}/permissions/{overwrite_id}
+DELETE /channels/{channel_id}/permissions/{overwrite_id}
+GET    /channels/{channel_id}/invites
+POST   /channels/{channel_id}/invites
+POST   /channels/{channel_id}/followers
+POST   /channels/{channel_id}/messages/{message_id}/threads
+POST   /channels/{channel_id}/threads
+PUT    /channels/{channel_id}/thread-members/@me
+DELETE /channels/{channel_id}/thread-members/@me
+PUT    /channels/{channel_id}/thread-members/{user_id}
+DELETE /channels/{channel_id}/thread-members/{user_id}
+GET    /channels/{channel_id}/threads/archived/public
+GET    /channels/{channel_id}/threads/archived/private
+GET    /channels/{channel_id}/users/@me/threads/archived/private
+PUT    /channels/{channel_id}/voice-status
+GET    /channels/{channel_id}/permissions/member/{user_id}
+GET    /channels/{channel_id}/permissions/role/{role_id}
+POST   /channels/{channel_id}/messages/bulk-delete
+GET    /channels/{channel_id}/thread-members
+GET    /channels/{channel_id}/thread-members/{user_id}
+GET    /channels/{channel_id}/messages/pins
+PUT    /channels/{channel_id}/messages/pins/{message_id}
+DELETE /channels/{channel_id}/messages/pins/{message_id}
+DELETE /channels/{channel_id}/messages/{message_id}/reactions/{emoji}/@me
+GET    /channels/{channel_id}/polls/{message_id}/answers/{answer_id}
+POST   /channels/{channel_id}/polls/{message_id}/expire
+DELETE /channels/{channel_id}/recipients/{user_id}
+PUT    /channels/{channel_id}/recipients/{user_id}
+POST   /channels/{channel_id}/send-soundboard-sound
+GET    /channels/{channel_id}/threads/search
+GET    /channels/{channel_id}/webhooks
+POST   /channels/{channel_id}/webhooks
+
+# gateway (missing op)
+GET    /gateway
+
+# users (crates/rift-rest/src/user.rs)
+GET    /users/@me
+PATCH  /users/@me
+GET    /users/@me/applications/{application_id}/entitlements
+GET    /users/@me/applications/{application_id}/role-connection
+PUT    /users/@me/applications/{application_id}/role-connection
+DELETE /users/@me/applications/{application_id}/role-connection
+POST   /users/@me/channels
+GET    /users/@me/connections
+GET    /users/@me/guilds
+DELETE /users/@me/guilds/{guild_id}
+GET    /users/@me/guilds/{guild_id}/member
+GET    /users/{user_id}
+
+# invites (crates/rift-rest/src/invite.rs)
+GET    /invites/{code}
+DELETE /invites/{code}
+GET    /invites/{code}/target-users
+PUT    /invites/{code}/target-users
+POST   /invites/{code}/target-users/bulk-add
+POST   /invites/{code}/target-users/bulk-delete
+GET    /invites/{code}/target-users/job-status
+PUT    /invites/{code}/target-users/{user_id}
+DELETE /invites/{code}/target-users/{user_id}
+
+# stickers (crates/rift-rest/src/sticker.rs)
+GET    /stickers/{sticker_id}
+GET    /sticker-packs
+GET    /sticker-packs/{pack_id}
+
+# stage instances (crates/rift-rest/src/stage.rs)
+POST   /stage-instances
+GET    /stage-instances/{channel_id}
+PATCH  /stage-instances/{channel_id}
+DELETE /stage-instances/{channel_id}
+
+# soundboard, voice, skus (crates/rift-rest/src/misc.rs)
+GET    /soundboard-default-sounds
+GET    /voice/regions
+GET    /skus/{sku_id}/subscriptions
+GET    /skus/{sku_id}/subscriptions/{subscription_id}
+
+
+# webhooks (crates/rift-rest/src/webhook.rs)
+GET    /webhooks/{webhook_id}
+PATCH  /webhooks/{webhook_id}
+DELETE /webhooks/{webhook_id}
+GET    /webhooks/{webhook_id}/{webhook_token}
+PATCH  /webhooks/{webhook_id}/{webhook_token}
+DELETE /webhooks/{webhook_id}/{webhook_token}
+POST   /webhooks/{webhook_id}/{webhook_token}/github
+GET    /webhooks/{webhook_id}/{webhook_token}/messages/@original
+GET    /webhooks/{webhook_id}/{webhook_token}/messages/{message_id}
+POST   /webhooks/{webhook_id}/{webhook_token}/slack
+
+# applications (crates/rift-rest/src/application.rs)
+GET    /applications/@me
+PATCH  /applications/@me
+GET    /applications/{application_id}
+PATCH  /applications/{application_id}
+GET    /applications/{application_id}/activity-instances/{instance_id}
+POST   /applications/{application_id}/attachment
+GET    /applications/{application_id}/commands/{command_id}
+PATCH  /applications/{application_id}/commands/{command_id}
+GET    /applications/{application_id}/emojis
+POST   /applications/{application_id}/emojis
+DELETE /applications/{application_id}/emojis/{emoji_id}
+GET    /applications/{application_id}/emojis/{emoji_id}
+PATCH  /applications/{application_id}/emojis/{emoji_id}
+GET    /applications/{application_id}/entitlements
+POST   /applications/{application_id}/entitlements
+DELETE /applications/{application_id}/entitlements/{entitlement_id}
+GET    /applications/{application_id}/entitlements/{entitlement_id}
+POST   /applications/{application_id}/entitlements/{entitlement_id}/consume
+GET    /applications/{application_id}/guilds/{guild_id}/commands/permissions
+GET    /applications/{application_id}/guilds/{guild_id}/commands/{command_id}
+PATCH  /applications/{application_id}/guilds/{guild_id}/commands/{command_id}
+GET    /applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions
+PUT    /applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions
+GET    /applications/{application_id}/role-connections/metadata
+PUT    /applications/{application_id}/role-connections/metadata
+
+# oauth2 (crates/rift-rest/src/oauth.rs)
+GET    /oauth2/@me
+GET    /oauth2/applications/@me
+GET    /oauth2/keys
+GET    /oauth2/userinfo
+
+
+# guilds (crates/rift-rest/src/guild.rs)
+GET    /guilds/templates/{code}
+GET    /guilds/{guild_id}
+PATCH  /guilds/{guild_id}
+GET    /guilds/{guild_id}/audit-logs
+GET    /guilds/{guild_id}/auto-moderation/rules
+POST   /guilds/{guild_id}/auto-moderation/rules
+GET    /guilds/{guild_id}/auto-moderation/rules/{rule_id}
+PATCH  /guilds/{guild_id}/auto-moderation/rules/{rule_id}
+DELETE /guilds/{guild_id}/auto-moderation/rules/{rule_id}
+GET    /guilds/{guild_id}/bans
+GET    /guilds/{guild_id}/bans/{user_id}
+DELETE /guilds/{guild_id}/bans/{user_id}
+PUT    /guilds/{guild_id}/bans/{user_id}
+POST   /guilds/{guild_id}/bulk-ban
+GET    /guilds/{guild_id}/channels
+POST   /guilds/{guild_id}/channels
+PATCH  /guilds/{guild_id}/channels
+GET    /guilds/{guild_id}/emojis
+POST   /guilds/{guild_id}/emojis
+GET    /guilds/{guild_id}/emojis/{emoji_id}
+PATCH  /guilds/{guild_id}/emojis/{emoji_id}
+DELETE /guilds/{guild_id}/emojis/{emoji_id}
+PUT    /guilds/{guild_id}/incident-actions
+GET    /guilds/{guild_id}/integrations
+DELETE /guilds/{guild_id}/integrations/{integration_id}
+GET    /guilds/{guild_id}/invites
+GET    /guilds/{guild_id}/members
+PATCH  /guilds/{guild_id}/members/@me
+GET    /guilds/{guild_id}/members/search
+GET    /guilds/{guild_id}/members/{user_id}
+PATCH  /guilds/{guild_id}/members/{user_id}
+DELETE /guilds/{guild_id}/members/{user_id}
+PUT    /guilds/{guild_id}/members/{user_id}
+DELETE /guilds/{guild_id}/members/{user_id}/roles/{role_id}
+PUT    /guilds/{guild_id}/members/{user_id}/roles/{role_id}
+GET    /guilds/{guild_id}/messages/search
+GET    /guilds/{guild_id}/new-member-welcome
+GET    /guilds/{guild_id}/onboarding
+PUT    /guilds/{guild_id}/onboarding
+GET    /guilds/{guild_id}/permissions/member/{user_id}
+GET    /guilds/{guild_id}/permissions/role/{role_id}
+GET    /guilds/{guild_id}/preview
+GET    /guilds/{guild_id}/prune
+POST   /guilds/{guild_id}/prune
+GET    /guilds/{guild_id}/regions
+GET    /guilds/{guild_id}/requests
+PATCH  /guilds/{guild_id}/requests/{request_id}
+GET    /guilds/{guild_id}/roles
+POST   /guilds/{guild_id}/roles
+PATCH  /guilds/{guild_id}/roles
+GET    /guilds/{guild_id}/roles/member-counts
+GET    /guilds/{guild_id}/roles/{role_id}
+PATCH  /guilds/{guild_id}/roles/{role_id}
+DELETE /guilds/{guild_id}/roles/{role_id}
+GET    /guilds/{guild_id}/scheduled-events
+POST   /guilds/{guild_id}/scheduled-events
+GET    /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}
+PATCH  /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}
+DELETE /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}
+POST   /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/exceptions
+PATCH  /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/exceptions/{exception_id}
+DELETE /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/exceptions/{exception_id}
+GET    /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/users
+GET    /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/users/counts
+GET    /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/{guild_scheduled_event_exception_id}/users
+GET    /guilds/{guild_id}/soundboard-sounds
+POST   /guilds/{guild_id}/soundboard-sounds
+GET    /guilds/{guild_id}/soundboard-sounds/{sound_id}
+PATCH  /guilds/{guild_id}/soundboard-sounds/{sound_id}
+DELETE /guilds/{guild_id}/soundboard-sounds/{sound_id}
+GET    /guilds/{guild_id}/stickers
+POST   /guilds/{guild_id}/stickers
+GET    /guilds/{guild_id}/stickers/{sticker_id}
+PATCH  /guilds/{guild_id}/stickers/{sticker_id}
+DELETE /guilds/{guild_id}/stickers/{sticker_id}
+GET    /guilds/{guild_id}/templates
+POST   /guilds/{guild_id}/templates
+PATCH  /guilds/{guild_id}/templates/{code}
+DELETE /guilds/{guild_id}/templates/{code}
+PUT    /guilds/{guild_id}/templates/{code}
+GET    /guilds/{guild_id}/threads/active
+GET    /guilds/{guild_id}/vanity-url
+GET    /guilds/{guild_id}/voice-states/@me
+PATCH  /guilds/{guild_id}/voice-states/@me
+GET    /guilds/{guild_id}/voice-states/{user_id}
+PATCH  /guilds/{guild_id}/voice-states/{user_id}
+GET    /guilds/{guild_id}/webhooks
+GET    /guilds/{guild_id}/welcome-screen
+PATCH  /guilds/{guild_id}/welcome-screen
+GET    /guilds/{guild_id}/widget
+PATCH  /guilds/{guild_id}/widget
+GET    /guilds/{guild_id}/widget.json
+GET    /guilds/{guild_id}/widget.png
+
+# lobbies (crates/rift-rest/src/lobby.rs)
+POST   /lobbies
+PUT    /lobbies
+DELETE /lobbies/{lobby_id}
+GET    /lobbies/{lobby_id}
+PATCH  /lobbies/{lobby_id}
+PATCH  /lobbies/{lobby_id}/channel-linking
+DELETE /lobbies/{lobby_id}/members/@me
+POST   /lobbies/{lobby_id}/members/@me/invites
+POST   /lobbies/{lobby_id}/members/bulk
+DELETE /lobbies/{lobby_id}/members/{user_id}
+PUT    /lobbies/{lobby_id}/members/{user_id}
+POST   /lobbies/{lobby_id}/members/{user_id}/invites
+GET    /lobbies/{lobby_id}/messages
+POST   /lobbies/{lobby_id}/messages
+PUT    /lobbies/{lobby_id}/messages/{message_id}/moderation-metadata
+
+# partner-sdk (crates/rift-rest/src/lobby.rs)
+PUT    /partner-sdk/dms/{user_id_1}/{user_id_2}/messages/{message_id}/moderation-metadata
+POST   /partner-sdk/provisional-accounts/unmerge
+POST   /partner-sdk/provisional-accounts/unmerge/bot
+POST   /partner-sdk/token
+POST   /partner-sdk/token/bot

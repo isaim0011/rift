@@ -1,0 +1,43 @@
+[package]
+name = "rift-discord"
+description = "Fast Discord library: one client that runs REST + sharded gateway on a Rust core."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+publish = true
+
+[lib]
+name = "rift"
+
+[features]
+default = ["cache", "framework"]
+full = ["cache", "framework", "voice"]
+cache = ["dep:rift-cache"]
+framework = []
+voice = ["dep:rift-voice"]
+
+[dependencies]
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
+rift-gateway = { path = "../rift-gateway", version = "0.1.0" }
+rift-runtime = { path = "../rift-runtime", version = "0.1.0" }
+rift-rest = { path = "../rift-rest", version = "0.1.0" }
+rift-http = { path = "../rift-http", version = "0.1.0" }
+rift-model = { path = "../rift-model", version = "0.1.0" }
+rift-cache = { path = "../rift-cache", version = "0.1.0", optional = true }
+rift-voice = { path = "../rift-voice", version = "0.1.0", optional = true }
+tracing = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "signal"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util", "macros", "rt", "time", "sync"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

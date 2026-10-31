@@ -1,0 +1,11 @@
+[package]
+name = "rift-coverage"
+description = "Measures rift's REST coverage against Discord's OpenAPI spec (not published)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+rust-version = "1.75"
+
+[dependencies]
+serde_json = "1"

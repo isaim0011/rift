@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = ["crates/rift-core", "crates/rift-gateway", "crates/rift-runtime", "crates/rift-http", "crates/rift-rest", "crates/rift", "crates/rift-bench", "crates/rift-coverage", "crates/rift-model", "crates/rift-cache", "crates/rift-voice"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/isaim0011/rift"
+homepage = "https://github.com/isaim0011/rift"
+documentation = "https://docs.rs/rift-discord"
+readme = "README.md"
+keywords = ["discord", "bot", "gateway", "api", "async"]
+categories = ["api-bindings", "asynchronous", "network-programming"]
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+opt-level = 3

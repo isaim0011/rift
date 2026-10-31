@@ -1,0 +1,28 @@
+[package]
+name = "rift-runtime"
+description = "Async Tokio driver that runs rift-gateway over a WebSocket with zstd-stream compression."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/rift-runtime"
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+publish = true
+
+[dependencies]
+rift-core = { path = "../rift-core", version = "0.1.0" }
+rift-gateway = { path = "../rift-gateway", version = "0.1.0" }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "net", "signal"] }
+# TLS: native-tls is the easiest on Windows/macOS. For static Linux builds we
+# will add a `rustls` feature flag later. If 0.30 has API changes, only
+# src/transport.rs needs fixing (fallback: "0.28").
+tokio-tungstenite = { version = "0.30", features = ["native-tls"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+zstd = "0.13"
+tracing = "0.1"

@@ -1,0 +1,18 @@
+[package]
+name = "rift-http"
+description = "Sans-IO REST rate limiting for Discord: buckets, global limit, invalid-request circuit breaker."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/rift-http"
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+publish = true
+
+[dependencies]
+ed25519-dalek = { version = "2", default-features = false, features = ["fast"] }
+

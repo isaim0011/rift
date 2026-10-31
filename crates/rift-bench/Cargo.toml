@@ -1,0 +1,44 @@
+[package]
+name = "rift-bench"
+description = "Criterion benchmarks for rift's hot paths (not published)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+# criterion 0.8 needs a newer compiler than the library crates do.
+rust-version = "1.86"
+
+[dependencies]
+ed25519-dalek = { version = "2", default-features = false, features = ["fast"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+regex = "1"
+rift-cache = { path = "../rift-cache" }
+rift-core = { path = "../rift-core" }
+rift-gateway = { path = "../rift-gateway" }
+rift-http = { path = "../rift-http" }
+rift-model = { path = "../rift-model" }
+rift-rest = { path = "../rift-rest" }
+rift-runtime = { path = "../rift-runtime" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "net"] }
+tokio-tungstenite = "0.30"
+zstd = "0.13"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+criterion = { version = "0.8", features = ["html_reports"] }
+
+[[bench]]
+name = "hot_paths"
+harness = false
+
+[[example]]
+name = "harness"
+path = "examples/harness.rs"
+
+[[example]]
+name = "compare"
+path = "examples/compare.rs"

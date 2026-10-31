@@ -1,0 +1,36 @@
+# Rust build artifacts
+/target
+**/target
+
+# Environment & secrets — NEVER commit
+.env
+.env.*
+*.pem
+*.key
+coverage.zip
+.agents/
+
+# Node.js / Bun
+node_modules/
+bindings/node/*.node
+bindings/node/npm/
+package-lock.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+.eggs/
+*.whl
+*.so
+*.pyd
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

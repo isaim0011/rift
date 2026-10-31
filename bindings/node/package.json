@@ -1,0 +1,43 @@
+{
+  "name": "rift-node",
+  "version": "0.0.1",
+  "description": "High-performance Node/Bun bindings for Rift Discord engine",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "rift-node",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-pc-windows-msvc",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "napi build --platform --release --cargo-flags \"--features napi-binding\"",
+    "build:debug": "napi build --platform --cargo-flags \"--features napi-binding\"",
+    "test": "node --test test/node_binding.test.js"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.0.0"
+  },
+  "engines": {
+    "node": ">= 18.0.0"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.node"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.js",
+      "default": "./index.js"
+    }
+  }
+}

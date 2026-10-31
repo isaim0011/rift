@@ -1,0 +1,29 @@
+[package]
+name = "rift-rest"
+description = "Async Discord REST client: rate-limited, retrying, with a swappable transport."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/rift-rest"
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+publish = true
+
+[dependencies]
+rift-core = { path = "../rift-core", version = "0.1.0" }
+rift-gateway = { path = "../rift-gateway", version = "0.1.0" }
+rift-http = { path = "../rift-http", version = "0.1.0" }
+tokio = { version = "1", features = ["time", "macros", "rt-multi-thread"] }
+# native-tls matches the gateway crate (SChannel on Windows). A `rustls`
+# feature flag comes before release. If a feature name differs in your 0.13.x,
+# only this line and src/transport.rs are affected.
+reqwest = { version = "0.13", default-features = false, features = ["native-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util", "macros", "rt", "time"] }

@@ -1,0 +1,19 @@
+[package]
+name = "rift-model"
+description = "Typed Discord Gateway dispatch events and models, parsed lazily."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/rift-model"
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+publish = true
+
+[dependencies]
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }

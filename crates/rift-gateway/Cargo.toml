@@ -1,0 +1,17 @@
+[package]
+name = "rift-gateway"
+description = "Sans-IO Discord gateway state machine: heartbeat, resume, identify budget, send limiter."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation = "https://docs.rs/rift-gateway"
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+publish = true
+
+[dependencies]
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
