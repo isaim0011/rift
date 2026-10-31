@@ -491,6 +491,44 @@ pub struct AuditLogEntry {
     pub reason: Option<String>,
 }
 
+impl AuditLogEntry {
+    /// Returns `true` if this audit entry represents a channel deletion (`action_type == 12`).
+    pub fn is_channel_deletion(&self) -> bool {
+        self.action_type == 12
+    }
+
+    /// Returns `true` if this audit entry represents a role deletion (`action_type == 32`).
+    pub fn is_role_deletion(&self) -> bool {
+        self.action_type == 32
+    }
+
+    /// Returns `true` if this audit entry represents a member ban (`action_type == 22`).
+    pub fn is_member_ban(&self) -> bool {
+        self.action_type == 22
+    }
+
+    /// Returns `true` if this audit entry represents a member kick (`action_type == 20`).
+    pub fn is_member_kick(&self) -> bool {
+        self.action_type == 20
+    }
+
+    /// Returns `true` if this audit entry represents a webhook creation (`action_type == 50`).
+    pub fn is_webhook_creation(&self) -> bool {
+        self.action_type == 50
+    }
+
+    /// Returns `true` if this audit entry represents a webhook deletion (`action_type == 52`).
+    pub fn is_webhook_deletion(&self) -> bool {
+        self.action_type == 52
+    }
+
+    /// Returns `true` if this entry represents a potentially destructive administrative action
+    /// (channel/role/webhook deletion, member kick/ban/prune, or bulk message deletion).
+    pub fn is_destructive(&self) -> bool {
+        matches!(self.action_type, 12 | 15 | 20 | 21 | 22 | 32 | 42 | 52 | 62 | 73)
+    }
+}
+
 /// Account information for a guild integration.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IntegrationAccount {
@@ -848,4 +886,49 @@ pub struct Guild {
     /// Scheduled events in the guild.
     #[serde(default)]
     pub guild_scheduled_events: Option<Vec<GuildScheduledEvent>>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_audit_log_entry_helpers() {
+        let channel_del = AuditLogEntry {
+            id: Snowflake::new(1),
+            target_id: None,
+            changes: None,
+            user_id: None,
+            action_type: 12,
+            options: None,
+            reason: None,
+        };
+        assert!(channel_del.is_channel_deletion());
+        assert!(channel_del.is_destructive());
+        assert!(!channel_del.is_role_deletion());
+
+        let role_del = AuditLogEntry {
+            id: Snowflake::new(2),
+            target_id: None,
+            changes: None,
+            user_id: None,
+            action_type: 32,
+            options: None,
+            reason: None,
+        };
+        assert!(role_del.is_role_deletion());
+        assert!(role_del.is_destructive());
+
+        let ban = AuditLogEntry {
+            id: Snowflake::new(3),
+            target_id: None,
+            changes: None,
+            user_id: None,
+            action_type: 22,
+            options: None,
+            reason: None,
+        };
+        assert!(ban.is_member_ban());
+        assert!(ban.is_destructive());
+    }
 }

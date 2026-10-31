@@ -30,6 +30,7 @@ pub mod cache;
 pub mod config;
 pub mod permissions;
 pub mod stats;
+pub mod velocity;
 
 pub use cache::Cache;
 pub use config::CacheConfig;
@@ -38,6 +39,7 @@ pub use permissions::{
     is_timed_out, parse_iso8601_to_unix,
 };
 pub use stats::CacheStats;
+pub use velocity::{SlidingWindow, VelocityTracker};
 
 // Re-export common primitives for convenience
 pub use rift_core::{Permissions, Snowflake};

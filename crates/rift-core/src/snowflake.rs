@@ -58,6 +58,61 @@ impl fmt::Display for Snowflake {
     }
 }
 
+#[cfg(feature = "serde")]
+impl serde::Serialize for Snowflake {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.collect_str(&self.0)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de> serde::Deserialize<'de> for Snowflake {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct SnowflakeVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for SnowflakeVisitor {
+            type Value = Snowflake;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a snowflake as a string or u64 integer")
+            }
+
+            fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                value.parse::<u64>().map(Snowflake).map_err(E::custom)
+            }
+
+            fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                Ok(Snowflake(value))
+            }
+
+            fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                if value < 0 {
+                    Err(E::custom("snowflake cannot be negative"))
+                } else {
+                    Ok(Snowflake(value as u64))
+                }
+            }
+        }
+
+        deserializer.deserialize_any(SnowflakeVisitor)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -80,5 +135,24 @@ mod tests {
         assert_eq!(s.get(), EXAMPLE);
         assert_eq!(s.to_string(), "175928847299117063");
         assert!("nope".parse::<Snowflake>().is_err());
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn serde_string_and_integer_roundtrip() {
+        let s = Snowflake::new(EXAMPLE);
+        // String format
+        let json_str = format!("\"{}\"", EXAMPLE);
+        let deserialized: Snowflake = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(deserialized, s);
+
+        // Integer format
+        let json_int = format!("{}", EXAMPLE);
+        let deserialized_int: Snowflake = serde_json::from_str(&json_int).unwrap();
+        assert_eq!(deserialized_int, s);
+
+        // Serialization format is string (Discord convention)
+        let serialized = serde_json::to_string(&s).unwrap();
+        assert_eq!(serialized, json_str);
     }
 }

@@ -24,7 +24,7 @@ framework = []
 voice = ["dep:rift-voice"]
 
 [dependencies]
-rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0", features = ["serde"] }
 rift-gateway = { path = "../rift-gateway", version = "0.1.0" }
 rift-runtime = { path = "../rift-runtime", version = "0.1.0" }
 rift-rest = { path = "../rift-rest", version = "0.1.0" }
