@@ -1,0 +1,14 @@
+{
+  "name": "rift-mcp",
+  "version": "0.1.0",
+  "description": "Model Context Protocol (MCP) server for Rift Discord Engine on Cloudflare Workers and Node.js",
+  "main": "worker.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": ["mcp", "discord", "model-context-protocol", "cloudflare-worker", "ai-agents"],
+  "author": "isaim0011",
+  "license": "MIT"
+}

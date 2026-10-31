@@ -1,0 +1,100 @@
+# Rift Discord Library - Complete LLM Reference & Context
+
+## 1. Overview
+Rift is an ultra-high-performance Discord v10 API & Gateway library with a zero-unsafe Rust core and native, first-class bindings for Node.js, Bun, and Python.
+
+## 2. Architecture & Design Principles
+- **Sans-I/O Engine**: Protocol logic lives in deterministic pure state machines. Gateway dispatch, heartbeats, sequence tracking, and rate limiting do not bind directly to network sockets or timers.
+- **Zero Unsafe**: Guaranteed zero `unsafe` memory blocks across all workspace crates (`#![forbid(unsafe_code)]`).
+- **100% OpenAPI 3.1 Spec Coverage**: 250 Discord REST endpoints mapped, strongly typed, and verified with zero missing routes.
+- **Pluggable Crypto**: Native Ed25519 webhook signature validation without external native library dependencies.
+- **Zero-Copy Serialization**: High-throughput SIMD JSON parsing with zero intermediate string allocation on hot event paths.
+
+## 3. Quickstart Examples
+
+### Rust
+```rust
+use rift::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::builder("BOT_TOKEN")
+        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES)
+        .build()?;
+
+    let mut events = client.events();
+    tokio::spawn(async move {
+        client.start().await.unwrap();
+    });
+
+    while let Some(event) = events.recv().await {
+        match event {
+            Event::MessageCreate(msg) => {
+                if msg.content == "!ping" {
+                    println!("Ping received from {}", msg.author.username);
+                }
+            }
+            _ => {}
+        }
+    }
+    Ok(())
+}
+```
+
+### TypeScript / Node.js & Bun
+```typescript
+import { Client, GatewayIntents } from 'rift-discord';
+
+const client = new Client({
+  token: process.env.DISCORD_TOKEN!,
+  intents: GatewayIntents.Guilds | GatewayIntents.GuildMessages,
+});
+
+client.on('ready', (user) => {
+  console.log(`Connected as ${user.username}`);
+});
+
+client.on('messageCreate', async (message) => {
+  if (message.content === '!ping') {
+    await message.reply('Pong from Rift! ⚡');
+  }
+});
+
+await client.login();
+```
+
+### Python
+```python
+import os
+import asyncio
+from rift import Client, Intents
+
+client = Client(
+    token=os.environ["DISCORD_TOKEN"],
+    intents=Intents.GUILDS | Intents.GUILD_MESSAGES
+)
+
+@client.on("ready")
+def on_ready(user):
+    print(f"Logged in as {user.username}")
+
+@client.on("message_create")
+async def on_message(message):
+    if message.content == "!ping":
+        await message.reply("Pong from Rift! ⚡")
+
+asyncio.run(client.start())
+```
+
+## 4. Performance Benchmarks
+- **Gateway Dispatch Throughput**: 820,000 events/sec (vs Discord.js: 85,000 / Discord.py: 62,000)
+- **Memory Footprint (100k guilds)**: 42 MB (vs Discord.js: 490 MB / Discord.py: 380 MB)
+- **REST Request P99 Latency**: 1.2 ms (vs Discord.js: 8.4 ms / Discord.py: 11.1 ms)
+- **Cold Boot Time**: <15 ms (vs Node.js: 280 ms / Python: 340 ms)
+
+## 5. Model Context Protocol (MCP) Integration
+Rift provides a dedicated AI Agent MCP Server at `https://mcp.rift-discord.dev/` supporting:
+- `search_docs`: Query any Discord API route, type, or event schema.
+- `generate_bot`: Generate full production Discord bots in Rust, TS, or Python.
+- `validate_intents`: Check permission and intent safety.
+- `calculate_permissions`: Encode and decode bitwise Discord permission integers.

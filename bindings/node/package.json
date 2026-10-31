@@ -1,6 +1,6 @@
 {
-  "name": "rift-node",
-  "version": "0.0.1",
+  "name": "rift-discord",
+  "version": "0.1.0",
   "description": "High-performance Node/Bun bindings for Rift Discord engine",
   "main": "index.js",
   "types": "index.d.ts",

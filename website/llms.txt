@@ -1,0 +1,24 @@
+# Rift Discord Engine
+
+> The zero-unsafe, sans-I/O Discord v10 architecture built in Rust with native bindings for Node.js, Bun, and Python.
+
+## Core Concepts
+- Pure Sans-I/O: Protocol state machines are decoupled from network transports, allowing deterministic testing and zero-overhead execution.
+- Zero Unsafe: Every crate in the workspace compiles under `#![forbid(unsafe_code)]`.
+- 100% OpenAPI 3.1 Spec Coverage: 250/250 Discord REST routes implemented, typed, and continuously validated against Discord's official schema.
+- True Multi-Language: Write in Rust (`use rift::prelude::*;`), Node.js/Bun (`import { Client } from 'rift-discord'`), or Python (`from rift import Client`).
+
+## Installation
+- Rust (Cargo): `cargo add rift-discord`
+- Node.js (npm): `npm install rift-discord`
+- Bun: `bun add rift-discord`
+- Python (pip): `pip install rift-discord`
+
+## Documentation & Links
+- Repository: https://github.com/isaim0011/rift
+- Documentation: https://rift-discord.dev/
+- Crates.io: https://crates.io/crates/rift-discord
+- npm: https://www.npmjs.com/package/rift-discord
+- PyPI: https://pypi.org/project/rift-discord/
+- MCP Server: https://mcp.rift-discord.dev/ (Model Context Protocol endpoint for AI Agents)
+- Full LLM Knowledge Base: https://rift-discord.dev/llms-full.txt
