@@ -16,9 +16,9 @@
 
 ## Documentation & Links
 - Repository: https://github.com/isaim0011/rift
-- Documentation: https://rift-discord.dev/
+- Documentation: https://rift-discord.pages.dev/
 - Crates.io: https://crates.io/crates/rift-discord
 - npm: https://www.npmjs.com/package/rift-discord
 - PyPI: https://pypi.org/project/rift-discord/
-- MCP Server: https://mcp.rift-discord.dev/ (Model Context Protocol endpoint for AI Agents)
-- Full LLM Knowledge Base: https://rift-discord.dev/llms-full.txt
+- MCP Server: https://rift-mcp.i-s41m0011.workers.dev/ (Model Context Protocol endpoint for AI Agents)
+- Full LLM Knowledge Base: https://rift-discord.pages.dev/llms-full.txt

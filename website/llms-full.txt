@@ -93,7 +93,7 @@ asyncio.run(client.start())
 - **Cold Boot Time**: <15 ms (vs Node.js: 280 ms / Python: 340 ms)
 
 ## 5. Model Context Protocol (MCP) Integration
-Rift provides a dedicated AI Agent MCP Server at `https://mcp.rift-discord.dev/` supporting:
+Rift provides a dedicated AI Agent MCP Server at `https://rift-mcp.i-s41m0011.workers.dev/` supporting:
 - `search_docs`: Query any Discord API route, type, or event schema.
 - `generate_bot`: Generate full production Discord bots in Rust, TS, or Python.
 - `validate_intents`: Check permission and intent safety.

@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://rift-discord.dev/</loc>
+    <loc>https://rift-discord.pages.dev/</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://rift-discord.dev/#benchmarks</loc>
+    <loc>https://rift-discord.pages.dev/#benchmarks</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rift-discord.dev/#bindings</loc>
+    <loc>https://rift-discord.pages.dev/#bindings</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://rift-discord.dev/#architecture</loc>
+    <loc>https://rift-discord.pages.dev/#architecture</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://rift-discord.dev/#mcp</loc>
+    <loc>https://rift-discord.pages.dev/#mcp</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://rift-discord.dev/llms.txt</loc>
+    <loc>https://rift-discord.pages.dev/llms.txt</loc>
     <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
