@@ -1,14 +1,16 @@
 [build-system]
-requires = ["maturin>=1.0,<2.0"]
-build-backend = "maturin"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "rift-discord"
-version = "0.0.1"
-description = "High-performance Python bindings for Rift Discord engine"
+version = "0.1.0"
+description = "High-performance Python bindings for Rift Discord v10 engine"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT OR Apache-2.0" }
+authors = [{ name = "isaim0011" }]
+keywords = ["discord", "bot", "gateway", "api", "rust", "rift"]
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -17,7 +19,15 @@ classifiers = [
 ]
 dependencies = []
 
-[tool.maturin]
-features = ["pyo3/extension-module"]
-module-name = "rift._rift"
-python-source = "python"
+[project.urls]
+Homepage = "https://github.com/isaim0011/rift"
+Repository = "https://github.com/isaim0011/rift"
+
+[tool.setuptools.package-dir]
+"" = "python"
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.setuptools.package-data]
+rift = ["py.typed", "*.pyi"]

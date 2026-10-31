@@ -13,7 +13,7 @@ ed25519-dalek = { version = "2", default-features = false, features = ["fast"] }
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 regex = "1"
 rift-cache = { path = "../rift-cache" }
-rift-core = { path = "../rift-core" }
+rift-core = { package = "rift-discord-core", path = "../rift-core" }
 rift-gateway = { path = "../rift-gateway" }
 rift-http = { path = "../rift-http" }
 rift-model = { path = "../rift-model" }
