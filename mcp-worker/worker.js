@@ -251,7 +251,7 @@ export default {
       return new Response(JSON.stringify({
         status: "ok",
         server: "Rift Discord Engine MCP Server",
-        version: "0.1.0",
+        version: "0.2.0",
         docs: "https://rift-discord.dev/",
         repository: "https://github.com/isaim0011/rift",
         available_tools: TOOLS.map(t => t.name)
@@ -273,7 +273,7 @@ export default {
             result: {
               protocolVersion: "2024-11-05",
               capabilities: { tools: {} },
-              serverInfo: { name: "rift-mcp", version: "0.1.0" }
+              serverInfo: { name: "rift-mcp", version: "0.2.0" }
             }
           }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
         }

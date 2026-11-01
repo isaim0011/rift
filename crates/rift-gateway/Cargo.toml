@@ -14,4 +14,4 @@ categories.workspace = true
 publish = true
 
 [dependencies]
-rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.2.0" }

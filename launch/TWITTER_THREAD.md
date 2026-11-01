@@ -1,7 +1,7 @@
 # Twitter / X Launch Thread
 
 **Tweet 1 (Hook)**
-🚀 Introducing Rift (v0.1.0): The high-performance Discord engine.
+🚀 Introducing Rift (v0.2.0): The high-performance Discord engine.
 
 ⚡ 235k raw events/sec (82.8k full-stack)
 🛡️ 100% zero-unsafe Rust
@@ -82,7 +82,7 @@ Deploy free to Cloudflare Workers in 10 seconds:
 ---
 
 **Tweet 8 (Links & Install)**
-Rift v0.1.0 is live worldwide!
+Rift v0.2.0 is live worldwide!
 
 ⭐ GitHub: https://github.com/isaim0011/rift
 🌐 Website: https://rift-discord.dev/

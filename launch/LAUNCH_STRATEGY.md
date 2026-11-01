@@ -1,4 +1,4 @@
-# Rift v0.1.0 — Global Launch & SEO Backlink Strategy
+# Rift v0.2.0 — Global Launch & SEO Backlink Strategy
 
 A systematic playbook for launching **Rift** to developer communities, maximizing SEO domain authority, and establishing it as the premier high-performance Discord library.
 

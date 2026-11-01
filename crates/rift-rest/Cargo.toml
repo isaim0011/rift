@@ -14,9 +14,9 @@ categories.workspace = true
 publish = true
 
 [dependencies]
-rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
-rift-gateway = { path = "../rift-gateway", version = "0.1.0" }
-rift-http = { path = "../rift-http", version = "0.1.0" }
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.2.0" }
+rift-gateway = { path = "../rift-gateway", version = "0.2.0" }
+rift-http = { path = "../rift-http", version = "0.2.0" }
 tokio = { version = "1", features = ["time", "macros", "rt-multi-thread"] }
 # native-tls matches the gateway crate (SChannel on Windows). A `rustls`
 # feature flag comes before release. If a feature name differs in your 0.13.x,

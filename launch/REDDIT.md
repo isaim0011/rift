@@ -4,7 +4,7 @@
 
 ## 1. `r/rust`
 
-**Title**: Rift v0.1.0: Zero-unsafe, sans-I/O Discord engine with 100% REST OpenAPI coverage and Node/Bun/Python bindings
+**Title**: Rift v0.2.0: Zero-unsafe, sans-I/O Discord engine with 100% REST OpenAPI coverage and Node/Bun/Python bindings
 
 **Body**:
 Hey everyone,
@@ -22,7 +22,7 @@ I'm excited to share **Rift** (https://github.com/isaim0011/rift), a new high-pe
 Workspace crates are published on crates.io under `rift-discord`:
 ```toml
 [dependencies]
-rift = { package = "rift-discord", version = "0.1.0" }
+rift = { package = "rift-discord", version = "0.2.0" }
 ```
 
 Repository: https://github.com/isaim0011/rift

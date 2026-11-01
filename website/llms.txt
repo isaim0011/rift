@@ -1,6 +1,6 @@
-# Rift Discord Engine
+# Rift Discord Engine (v0.2.0)
 
-> The zero-unsafe, sans-I/O Discord v10 architecture built in Rust with native bindings for Node.js, Bun, and Python.
+> The zero-unsafe, sans-I/O Discord v10 architecture built in Rust with native bindings for Node.js, Bun, and Python (v0.2.0).
 
 ## Core Concepts
 - Pure Sans-I/O: Protocol state machines are decoupled from network transports, allowing deterministic testing and zero-overhead execution.

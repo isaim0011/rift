@@ -79,20 +79,20 @@ Rift is modularized so minimal bots, serverless webhook handlers, and CLI utilit
 Disables both the in-memory cache and the framework layer. Ideal for AWS Lambda, Cloudflare Workers, or microservices that only need REST requests, typed Snowflake math, or Ed25519 interaction verification:
 ```toml
 [dependencies]
-rift = { version = "0.0.1", default-features = false }
+rift = { package = "rift-discord", version = "0.2", default-features = false }
 ```
 
 #### 2. Gateway Bot without In-Memory Cache
 Runs a full gateway event loop or command framework without keeping guild or channel state in RAM:
 ```toml
 [dependencies]
-rift = { version = "0.0.1", default-features = false, features = ["framework"] }
+rift = { package = "rift-discord", version = "0.2", default-features = false, features = ["framework"] }
 ```
 
 #### 3. All Features Enabled (Full Engine with Voice)
 ```toml
 [dependencies]
-rift = { version = "0.0.1", features = ["full"] }
+rift = { package = "rift-discord", version = "0.2", features = ["full"] }
 ```
 
 ---

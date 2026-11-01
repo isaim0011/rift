@@ -14,6 +14,6 @@ categories.workspace = true
 publish = true
 
 [dependencies]
-rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.1.0" }
+rift-core = { package = "rift-discord-core", path = "../rift-core", version = "0.2.0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }

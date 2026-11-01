@@ -890,7 +890,7 @@ dependencies = [
 
 [[package]]
 name = "rift-cache"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-discord-core",
  "rift-model",
@@ -900,7 +900,7 @@ dependencies = [
 
 [[package]]
 name = "rift-discord"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-cache",
  "rift-discord-core",
@@ -917,28 +917,28 @@ dependencies = [
 
 [[package]]
 name = "rift-discord-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "rift-gateway"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-discord-core",
 ]
 
 [[package]]
 name = "rift-http"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "ed25519-dalek",
 ]
 
 [[package]]
 name = "rift-model"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-discord-core",
  "serde",
@@ -947,7 +947,7 @@ dependencies = [
 
 [[package]]
 name = "rift-py"
-version = "0.0.1"
+version = "0.2.0"
 dependencies = [
  "pyo3",
  "rift-cache",
@@ -964,7 +964,7 @@ dependencies = [
 
 [[package]]
 name = "rift-rest"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "reqwest",
  "rift-discord-core",
@@ -977,9 +977,10 @@ dependencies = [
 
 [[package]]
 name = "rift-runtime"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "futures-util",
+ "memchr",
  "rift-discord-core",
  "rift-gateway",
  "serde",

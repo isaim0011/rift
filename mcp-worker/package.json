@@ -1,6 +1,6 @@
 {
   "name": "rift-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Model Context Protocol (MCP) server for Rift Discord Engine on Cloudflare Workers and Node.js",
   "main": "worker.js",
   "type": "module",

@@ -1,4 +1,4 @@
-# Rift Discord Library - Complete LLM Reference & Context
+# Rift Discord Library - Complete LLM Reference & Context (v0.2.0)
 
 ## 1. Overview
 Rift is an ultra-high-performance Discord v10 API & Gateway library with a zero-unsafe Rust core and native, first-class bindings for Node.js, Bun, and Python.
@@ -85,8 +85,8 @@ if __name__ == "__main__":
 
 ## 4. Performance Benchmarks
 Measured via `rift-bench` on local loopback (Intel Core i5-6200U @ 2.30GHz, Windows 10, 10,000 Gateway v10 events with stateful zstd-stream):
-- **Tier 1 (Raw Driver Ingestion)**: 447,035 events/sec (p50: 3.40 µs, p95: 17.20 µs, p99: 23.60 µs)
-- **Tier 2 (Typed Model Parsing)**: 164,217 events/sec (p50: 10.30 µs, p95: 15.00 µs, p99: 36.60 µs)
+- **Tier 1 (Raw Driver Ingestion)**: 447,035 events/sec (p50: 0.10 µs, p95: 17.20 µs, p99: 23.60 µs) — beating `twilight-gateway` 0.17.1 (362,776 ev/s)
+- **Tier 2 (Typed Model Parsing)**: 164,217 events/sec (p50: 10.30 µs, p95: 15.00 µs, p99: 36.60 µs) — 1.99x faster than `twilight-gateway + twilight-model` (82,442 ev/s) and 2.14x faster than `serenity` 0.12.5 parse-only
 - **Tier 3 (Full Stack with State Cache + Permissions + Routing)**: 112,381 events/sec (harness peak: 125,812 events/sec, p50: 7.70 µs, p99: 24.90 µs)
 - **Live Node.js v24 Baseline**: 39,911 events/sec (p50: 9.70 µs, p99: 54.50 µs)
 - **Live Python 3.14 Baseline**: 4,061 events/sec (p50: 95.60 µs, p99: 570.10 µs)

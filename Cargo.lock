@@ -1079,7 +1079,7 @@ dependencies = [
 
 [[package]]
 name = "rift-bench"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "criterion",
  "ed25519-dalek",
@@ -1102,7 +1102,7 @@ dependencies = [
 
 [[package]]
 name = "rift-cache"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-discord-core",
  "rift-model",
@@ -1112,14 +1112,14 @@ dependencies = [
 
 [[package]]
 name = "rift-coverage"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde_json",
 ]
 
 [[package]]
 name = "rift-discord"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-cache",
  "rift-discord-core",
@@ -1137,7 +1137,7 @@ dependencies = [
 
 [[package]]
 name = "rift-discord-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -1145,21 +1145,21 @@ dependencies = [
 
 [[package]]
 name = "rift-gateway"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-discord-core",
 ]
 
 [[package]]
 name = "rift-http"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "ed25519-dalek",
 ]
 
 [[package]]
 name = "rift-model"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-discord-core",
  "serde",
@@ -1168,7 +1168,7 @@ dependencies = [
 
 [[package]]
 name = "rift-rest"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "reqwest",
  "rift-discord-core",
@@ -1181,7 +1181,7 @@ dependencies = [
 
 [[package]]
 name = "rift-runtime"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "futures-util",
  "memchr",
@@ -1197,7 +1197,7 @@ dependencies = [
 
 [[package]]
 name = "rift-voice"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rift-discord-core",
  "serde",

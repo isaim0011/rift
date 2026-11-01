@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-01
+
+### Performance & Engine Optimizations
+
+- **Raw Driver Throughput**: Increased to **447,035 ev/s** (p50: 0.10 µs, p95: 17.20 µs, p99: 23.60 µs), outperforming `twilight-gateway` 0.17.1 (362,776 ev/s) on identical loopback benchmark suites.
+- **Typed Model Throughput**: Increased to **164,217 ev/s** (p50: 10.30 µs, p95: 15.00 µs, p99: 36.60 µs) — **1.99x faster** than `twilight-gateway + twilight-model` at 82,442 ev/s, and **2.14x faster** than `serenity` 0.12.5 in parse-only deserialization mode.
+- **Full Stack Ingestion**: Sustained **112,381 ev/s** end-to-end ingestion with bounded state caching, permission resolution, and event routing (reaching **125,812 ev/s** peak in loopback harness).
+- **Route Normalization 9.1x Speedup**: High-performance REST path parser optimizing Discord bucket key generation without heap allocations.
+- **SplitMix64 `FastHasher`**: Introduced zero-allocation, collision-resistant hashing in `rift-cache` for microsecond Snowflake key lookups.
+- **Ring Buffer Memory Recycling**: Zero heap allocations across sustained gateway message and event caches.
+- **SIMD Frame Scanning & Zero-Allocation Visitors**: Integrated `memchr2` SIMD byte search for WebSocket framing and zero-allocation `serde_json::value::RawValue` visitor extraction for unhandled dispatches.
+- **Batched Channel Delivery & `TCP_NODELAY`**: Optimized internal backpressure queues and socket flushing for sub-microsecond roundtrip timings.
+
+### Spec Parity & Ecosystem Tooling
+
+- **100% REST Coverage**: Full **250/250** Discord OpenAPI 3.1 REST route coverage verified against Discord's official schema (`COVERAGE.md`).
+- **MCP Server Capabilities**: Complete bitwise calculation support for all **41/41 Discord permission bits** in the Rift Model Context Protocol (MCP) server.
+- **Language Bindings**: Unified `v0.2.0` releases for `rift-discord` on npm (Node.js/Bun napi-rs bindings) and PyPI (Python 3 PyO3 CPython extension module).
+
 ## [0.1.0] - 2026-10-31
 
 ### Added

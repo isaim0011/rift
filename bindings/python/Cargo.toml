@@ -1,6 +1,6 @@
 [package]
 name = "rift-py"
-version = "0.0.1"
+version = "0.2.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
@@ -11,13 +11,13 @@ name = "_rift"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-rift-core = { package = "rift-discord-core", path = "../../crates/rift-core" }
-rift-http = { path = "../../crates/rift-http" }
-rift-gateway = { path = "../../crates/rift-gateway" }
-rift-model = { path = "../../crates/rift-model" }
-rift-cache = { path = "../../crates/rift-cache" }
-rift-rest = { path = "../../crates/rift-rest" }
-rift = { package = "rift-discord", path = "../../crates/rift" }
+rift-core = { package = "rift-discord-core", path = "../../crates/rift-core", version = "0.2.0" }
+rift-http = { path = "../../crates/rift-http", version = "0.2.0" }
+rift-gateway = { path = "../../crates/rift-gateway", version = "0.2.0" }
+rift-model = { path = "../../crates/rift-model", version = "0.2.0" }
+rift-cache = { path = "../../crates/rift-cache", version = "0.2.0" }
+rift-rest = { path = "../../crates/rift-rest", version = "0.2.0" }
+rift = { package = "rift-discord", path = "../../crates/rift", version = "0.2.0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync"] }

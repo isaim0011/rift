@@ -3,5 +3,5 @@ main = "worker.js"
 compatibility_date = "2024-10-01"
 
 [vars]
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 REPOSITORY = "https://github.com/isaim0011/rift"
