@@ -16,9 +16,19 @@
 
 ## Documentation & Links
 - Repository: https://github.com/isaim0011/rift
-- Documentation: https://rift-discord.pages.dev/
+- Documentation & Guides: https://rift-discord.pages.dev/#guides
 - Crates.io: https://crates.io/crates/rift-discord
 - npm: https://www.npmjs.com/package/rift-discord
 - PyPI: https://pypi.org/project/rift-discord/
 - MCP Server: https://rift-mcp.i-s41m0011.workers.dev/ (Model Context Protocol endpoint for AI Agents)
 - Full LLM Knowledge Base: https://rift-discord.pages.dev/llms-full.txt
+
+## Developer Guides & Handbook (8 Chapters)
+1. Getting Started & First Bot (Discord Developer Portal, Bot Token, Privileged Intents)
+2. Slash Commands & Interaction Routing (Public vs Ephemeral, Async Deferrals, Autocomplete)
+3. Interactive Buttons, Select Menus & Modals (Action Rows, Form Submissions)
+4. Gateway Runtime, Sharding & Resiliency (Zstd-stream, Supervisor, Backpressure)
+5. State Cache & Nov 16 Obfuscation Safety (Permission Engine, Ring Buffers)
+6. 250/250 REST Operations & Webhook Signatures (Rate Limits, Ed25519 Verifier)
+7. Voice Gateway v8 & DAVE MLS Audio (UDP Discovery, RTP Framing, XChaCha20-Poly1305)
+8. AI Agent Integration (Cursor, Claude, Antigravity with Rift MCP)

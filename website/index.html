@@ -630,6 +630,337 @@
       header { flex-direction: column; gap: 1rem; }
       .benchmark-section { padding: 1.5rem; }
     }
+
+    /* Guide Section */
+    .guide-section {
+      margin: 5rem 0;
+      scroll-margin-top: 5rem;
+    }
+
+    .guide-header-area {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .guide-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 0.85rem 1.25rem;
+      border-radius: 12px;
+    }
+
+    .guide-search-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 380px;
+    }
+
+    .guide-search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.5rem 1rem 0.5rem 2.25rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .guide-search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .guide-search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .guide-lang-tabs {
+      display: flex;
+      gap: 0.4rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .guide-lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .guide-lang-btn:hover {
+      color: #fff;
+    }
+
+    .guide-lang-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .guide-layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 1.75rem;
+      align-items: flex-start;
+    }
+
+    .guide-sidebar {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 0.75rem;
+      position: sticky;
+      top: 5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+    }
+
+    .guide-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      border-radius: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .guide-nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .guide-nav-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.35);
+      color: #c7d2fe;
+    }
+
+    .guide-nav-item .chapter-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .guide-nav-item.active .chapter-num {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .guide-content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 2.25rem;
+      min-height: 650px;
+    }
+
+    .guide-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .guide-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .guide-summary {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 1.75rem;
+      line-height: 1.6;
+    }
+
+    .guide-callout {
+      border-left: 3px solid var(--accent);
+      background: rgba(99, 102, 241, 0.08);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.75rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .guide-callout.tip {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .guide-callout.warning {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .guide-callout strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: #fff;
+    }
+
+    .guide-h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 1.75rem 0 0.75rem 0;
+    }
+
+    .guide-p {
+      color: #d4d4d8;
+      font-size: 0.925rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .guide-list {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #d4d4d8;
+      font-size: 0.925rem;
+      line-height: 1.8;
+    }
+
+    .guide-list code, .guide-p code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 0.85rem;
+      color: #c7d2fe;
+    }
+
+    .guide-code-box {
+      background: #0d0d10;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1.25rem 0 1.75rem 0;
+    }
+
+    .guide-code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #141418;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .guide-code-tag {
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 0.75rem;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.15);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .guide-copy-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .guide-copy-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .guide-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .guide-page-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .guide-page-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
+    }
+
+    .guide-page-btn.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    @media (max-width: 900px) {
+      .guide-layout {
+        grid-template-columns: 1fr;
+      }
+      .guide-sidebar {
+        position: static;
+        max-height: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -643,6 +974,7 @@
     <nav>
       <a href="#features">Features</a>
       <a href="#benchmarks">Benchmarks</a>
+      <a href="#guides">Guides</a>
       <a href="#code">Code</a>
       <a href="#mcp">AI MCP</a>
       <a href="https://github.com/isaim0011/rift" target="_blank" rel="noopener">GitHub</a>
@@ -672,6 +1004,14 @@
         <div class="install-command">
           <span id="install-text">cargo add rift-discord</span>
           <button class="copy-btn" onclick="copyInstall()">Copy</button>
+        </div>
+        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:1rem; margin-top:1.25rem;">
+          <a href="#guides" class="btn-cta" style="background:var(--accent); text-decoration:none; padding:0.65rem 1.5rem; font-size:0.9rem; border-radius:8px; display:inline-flex; align-items:center; gap:0.5rem; font-weight:600;">
+            <span>📖 Developer Guides & Handbook</span>
+          </a>
+          <a href="#benchmarks" class="btn-cta" style="background:rgba(255,255,255,0.08); text-decoration:none; padding:0.65rem 1.5rem; font-size:0.9rem; border-radius:8px; font-weight:600;">
+            <span>⚡ Measured Benchmarks</span>
+          </a>
         </div>
       </div>
     </section>
@@ -805,7 +1145,78 @@
       </div>
     </section>
 
-    <!-- Code Examples -->
+
+    <!-- Developer Guides & Handbook -->
+    <section id="guides" class="guide-section">
+      <div class="guide-header-area">
+        <span class="badge-pill" style="margin-bottom: 0.75rem; display: inline-block;">Official Documentation</span>
+        <h2 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.75rem;">Developer Guides & Handbook</h2>
+        <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 650px; margin: 0 auto;">
+          Master Discord development with Rift. Production architecture patterns, code recipes, and best practices for high-scale bots.
+        </p>
+      </div>
+
+      <!-- Controls: Filter & Language Switcher -->
+      <div class="guide-controls">
+        <div class="guide-search-wrapper">
+          <span class="guide-search-icon">🔍</span>
+          <input type="text" class="guide-search-input" id="guide-filter" placeholder="Filter chapters (e.g. 'slash', 'cache', 'voice', 'dave')..." oninput="filterGuideChapters(this.value)">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">CODE SYNTAX:</span>
+          <div class="guide-lang-tabs">
+            <button class="guide-lang-btn active" id="glang-rust" onclick="setGuideLang('rust')">🦀 Rust</button>
+            <button class="guide-lang-btn" id="glang-ts" onclick="setGuideLang('ts')">🟨 TS / Bun</button>
+            <button class="guide-lang-btn" id="glang-py" onclick="setGuideLang('py')">🐍 Python</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two Column Layout: Sidebar + Active Guide Content -->
+      <div class="guide-layout">
+        <!-- Sidebar Navigation -->
+        <nav class="guide-sidebar" id="guide-sidebar" aria-label="Guide Chapters">
+          <!-- Dynamically populated via JS -->
+        </nav>
+
+        <!-- Main Content Area -->
+        <article class="guide-content-card" id="guide-article">
+          <div class="guide-meta">
+            <span class="badge-pill" id="guide-chap-badge">Chapter 01</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="guide-read-time">4 min read</span>
+          </div>
+          <h1 class="guide-title" id="guide-title">Getting Started & Setup</h1>
+          <p class="guide-summary" id="guide-summary"></p>
+
+          <div class="guide-callout" id="guide-callout">
+            <strong id="guide-callout-title"></strong>
+            <span id="guide-callout-text"></span>
+          </div>
+
+          <div id="guide-body-html"></div>
+
+          <div class="guide-code-box">
+            <div class="guide-code-header">
+              <span class="guide-code-tag" id="guide-code-file">src/main.rs</span>
+              <button class="guide-copy-btn" onclick="copyActiveGuideCode()">Copy Code</button>
+            </div>
+            <pre><code id="guide-code-display"></code></pre>
+          </div>
+
+          <div id="guide-deep-dive-html"></div>
+
+          <!-- Bottom Pagination -->
+          <div class="guide-pagination">
+            <button class="guide-page-btn" id="guide-prev-btn" onclick="navigateGuide(-1)">← Previous</button>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="guide-page-indicator">Chapter 1 of 8</span>
+            <button class="guide-page-btn" id="guide-next-btn" onclick="navigateGuide(1)">Next →</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+        <!-- Code Examples -->
     <section id="code" class="code-section">
       <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; text-align: center;">One Engine. Every Language.</h2>
       <p style="color: var(--text-muted); margin-bottom: 2rem; text-align: center;">Write your bot in the syntax you love without sacrificing native performance.</p>
@@ -1003,5 +1414,942 @@ if __name__ == "__main__":
       setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
     }
   </script>
+
+  <script>
+    // ----------------------------------------------------
+    // Official Developer Guides & Handbook Data (Chapters 1-8)
+    // ----------------------------------------------------
+    const guideChapters = [
+      {
+        id: 'getting-started',
+        num: '01',
+        icon: '🚀',
+        shortTitle: 'Getting Started',
+        title: 'Chapter 1: Getting Started & First Bot',
+        readTime: '3 min read',
+        summary: 'Step-by-step walkthrough to set up your Discord Developer Application, install Rift across Rust, Node.js/Bun, or Python, and launch a sub-microsecond bot connected to Gateway v10.',
+        callout: {
+          type: 'tip',
+          title: 'Privileged Intents Notice',
+          text: 'If your bot needs to inspect message content (for prefix commands) or receive member join events, remember to toggle MESSAGE_CONTENT and GUILD_MEMBERS under your Discord Developer Portal > Bot > Privileged Gateway Intents.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">1. Create Your Discord Application</h3>
+          <p class="guide-p">
+            Navigate to the <a href="https://discord.com/developers/applications" target="_blank" rel="noopener" style="color:var(--accent); text-decoration:underline;">Discord Developer Portal</a>, click <strong>New Application</strong>, and name your bot. Go to the <strong>Bot</strong> tab, click <strong>Reset Token</strong>, and securely store your bot token in your environment (<code>DISCORD_TOKEN</code>).
+          </p>
+
+          <h3 class="guide-h3">2. Installation</h3>
+          <p class="guide-p">Add Rift to your project in your preferred language:</p>
+          <ul class="guide-list">
+            <li><strong>Rust</strong>: <code>cargo add rift-discord</code> (or with framework: <code>rift = { package = "rift-discord", version = "0.2", features = ["full"] }</code>)</li>
+            <li><strong>Node.js / Bun</strong>: <code>npm install rift-discord</code> or <code>bun add rift-discord</code></li>
+            <li><strong>Python</strong>: <code>pip install rift-discord</code></li>
+          </ul>
+
+          <h3 class="guide-h3">3. Minimal Working Example</h3>
+          <p class="guide-p">Here is the minimal complete bot that authenticates with Gateway v10 and logs connection readiness:</p>
+        `,
+        code: {
+          rust: {
+            file: 'src/main.rs',
+            code: `use rift::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // 1. Initialize structured logging
+    tracing_subscriber::fmt::init();
+
+    // 2. Build the client with gateway intents
+    let token = std::env::var("DISCORD_TOKEN")
+        .expect("Missing DISCORD_TOKEN environment variable");
+        
+    let client = Client::builder(token, Intents::GUILDS | Intents::GUILD_MESSAGES)
+        .build()
+        .await?;
+
+    // 3. Register a simple slash command
+    let router = CommandRouter::new()
+        .slash("ping", "Check bot latency", |ctx| async move {
+            ctx.reply("Pong from Rift! ⚡").await?;
+            Ok(())
+        });
+
+    // 4. Run the multi-shard framework
+    let mut framework = Framework::new(client, router);
+    println!("⚡ Rift bot is online and listening to Gateway v10!");
+    framework.run().await?;
+
+    Ok(())
+}`
+          },
+          ts: {
+            file: 'src/index.ts',
+            code: `import { RiftClient, Intents, Snowflake } from 'rift-discord';
+
+const token = process.env.DISCORD_TOKEN;
+if (!token) throw new Error("Missing DISCORD_TOKEN");
+
+const client = new RiftClient({
+  token,
+  intents: Intents.GUILDS | Intents.GUILD_MESSAGES
+});
+
+client.on('READY', (readyData) => {
+  const user = readyData.user;
+  console.log(\`⚡ Connected as \${user.username}#\${user.discriminator} (ID: \${user.id})\`);
+});
+
+client.on('MESSAGE_CREATE', async (msg) => {
+  if (msg.content === '!ping') {
+    const createdTime = new Date(Snowflake.timestampMs(msg.id));
+    console.log(\`Ping received at \${createdTime.toISOString()}!\`);
+  }
+});
+
+client.connect();`
+          },
+          py: {
+            file: 'src/main.py',
+            code: `import os
+import asyncio
+from rift import RiftClient, Intents, Snowflake
+
+async def main():
+    token = os.environ.get("DISCORD_TOKEN")
+    if not token:
+        raise ValueError("Missing DISCORD_TOKEN environment variable")
+
+    client = RiftClient(token, intents=Intents.GUILDS | Intents.GUILD_MESSAGES)
+    print("⚡ Connecting Rift bot to Discord Gateway...")
+
+    while True:
+        event = await client.next_event()
+        if event is None:
+            break
+
+        if event.name == "READY":
+            user = event.data.get("user", {})
+            print(f"⚡ Ready as {user.get('username')} (ID: {user.get('id')})")
+
+        elif event.name == "MESSAGE_CREATE":
+            if event.data.get("content") == "!ping":
+                created_ms = Snowflake.timestamp_ms(event.data.get("id"))
+                print(f"Ping received! Message Snowflake Epoch: {created_ms} ms")
+
+if __name__ == "__main__":
+    asyncio.run(main())`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Next Steps</h3>
+          <p class="guide-p">
+            Once your bot logs in, continue to Chapter 2 to register slash commands with typed options, subcommands, and modal interactions!
+          </p>
+        `
+      },
+      {
+        id: 'slash-commands',
+        num: '02',
+        icon: '⚡',
+        shortTitle: 'Slash Commands',
+        title: 'Chapter 2: Slash Commands & Interaction Routing',
+        readTime: '4 min read',
+        summary: 'Learn how to define modern Discord Application Commands, handle typed options, return ephemeral replies, defer responses for long tasks, and implement real-time autocomplete.',
+        callout: {
+          type: 'tip',
+          title: '3-Second Acknowledge Rule',
+          text: 'Discord requires your bot to acknowledge interaction dispatches within 3 seconds. For operations taking longer than 3 seconds (database queries, AI generation, remote API calls), always call ctx.defer() immediately to receive a 15-minute response window.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">Command Architecture</h3>
+          <p class="guide-p">
+            Rift provides an ergonomic <code>CommandRouter</code> that automatically registers your slash commands with Discord upon startup and dispatches interaction events without heap allocations on hot paths.
+          </p>
+          <ul class="guide-list">
+            <li><strong>Public Reply</strong>: Sent to the channel, visible to all members.</li>
+            <li><strong>Ephemeral Reply (flags: 64)</strong>: Visible only to the user who invoked the command. Perfect for error messages or private confirmation prompts.</li>
+            <li><strong>Deferred Reply</strong>: Displays a "thinking..." state on Discord, allowing up to 15 minutes to edit the original reply.</li>
+            <li><strong>Autocomplete</strong>: As the user types in an option field, Discord streams live queries back to your router to return dynamic choices.</li>
+          </ul>
+        `,
+        code: {
+          rust: {
+            file: 'src/commands.rs',
+            code: `use rift::prelude::*;
+
+pub fn build_router() -> CommandRouter {
+    CommandRouter::new()
+        // 1. Basic slash command
+        .slash("help", "List bot capabilities", |ctx| async move {
+            ctx.reply_ephemeral("Available commands: /help, /ban, /query").await?;
+            Ok(())
+        })
+        // 2. Command with options and async deferral
+        .slash("query", "Search database records", |ctx| async move {
+            // Acknowledge within 3s to get a 15-minute response window
+            ctx.defer().await?;
+
+            // Extract option argument safely
+            let query_term = ctx.get_string("term").unwrap_or("default");
+
+            // Simulate database or API call
+            tokio::time::sleep(std::time::Duration::from_millis(800)).await;
+
+            ctx.edit_reply(format!("Found 42 results for '{}'!", query_term)).await?;
+            Ok(())
+        })
+        // 3. Command with permissions check
+        .slash("ban", "Ban a guild member", |ctx| async move {
+            if !ctx.member_permissions().contains(Permissions::BAN_MEMBERS) {
+                ctx.reply_ephemeral("❌ You lack BAN_MEMBERS permission.").await?;
+                return Ok(());
+            }
+
+            let target_user = ctx.get_user("target")?;
+            ctx.reply(format!("Banned user <@{}> 🔨", target_user.id)).await?;
+            Ok(())
+        })
+}`
+          },
+          ts: {
+            file: 'src/commands.ts',
+            code: `import { RiftClient, Permissions } from 'rift-discord';
+
+export function setupCommands(client: RiftClient) {
+  client.on('INTERACTION_CREATE', async (interaction) => {
+    if (interaction.type !== 2) return; // 2 = APPLICATION_COMMAND
+
+    const { name } = interaction.data;
+
+    if (name === 'help') {
+      // Ephemeral response (flags: 64)
+      await client.rest.createInteractionResponse(interaction.id, interaction.token, {
+        type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
+        data: {
+          content: 'Available commands: /help, /ping, /userinfo',
+          flags: 64 // Ephemeral
+        }
+      });
+    }
+
+    if (name === 'query') {
+      // Defer response (type 5 = DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE)
+      await client.rest.createInteractionResponse(interaction.id, interaction.token, {
+        type: 5
+      });
+
+      // Edit response once data is fetched
+      await client.rest.editOriginalInteractionResponse(interaction.application_id, interaction.token, {
+        content: 'Query completed in 1.2 ms with 14 results! ⚡'
+      });
+    }
+  });
+}`
+          },
+          py: {
+            file: 'src/commands.py',
+            code: `from rift import RiftClient, Permissions
+
+async def handle_interaction(client: RiftClient, interaction: dict):
+    if interaction.get("type") != 2: # APPLICATION_COMMAND
+        return
+
+    data = interaction.get("data", {})
+    name = data.get("name")
+    interaction_id = interaction.get("id")
+    token = interaction.get("token")
+
+    if name == "help":
+        # Reply with ephemeral flag
+        await client.rest.create_interaction_response(
+            interaction_id,
+            token,
+            type=4, # CHANNEL_MESSAGE_WITH_SOURCE
+            data={"content": "⚡ Rift Bot Handbook: /help, /ping, /stats", "flags": 64}
+        )
+
+    elif name == "defer_task":
+        # Type 5: DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+        await client.rest.create_interaction_response(
+            interaction_id,
+            token,
+            type=5
+        )`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Guild vs Global Commands</h3>
+          <p class="guide-p">
+            <strong>Global Commands</strong> are cached by Discord across all servers and can take up to an hour to propagate when modified during development.
+            <strong>Guild Commands</strong> update immediately upon registration, making them ideal for rapid local bot development.
+          </p>
+        `
+      },
+      {
+        id: 'components-modals',
+        num: '03',
+        icon: '🎨',
+        shortTitle: 'Buttons & Modals',
+        title: 'Chapter 3: Interactive Buttons, Select Menus & Modals',
+        readTime: '4 min read',
+        summary: 'Build rich, dynamic UI components including Action Rows, styled buttons, dropdown select menus, and popup modal forms.',
+        callout: {
+          type: 'note',
+          title: 'Discord Component Rules',
+          text: 'Each message can hold up to 5 Action Rows. Each Action Row can contain up to 5 buttons, OR exactly 1 Select Menu, OR 1 text input in a Modal.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">Interactive UI Elements</h3>
+          <p class="guide-p">
+            Rift provides type-safe component builders for all Discord component types:
+          </p>
+          <ul class="guide-list">
+            <li><strong>Button Styles</strong>: <code>Primary</code> (Blurple), <code>Secondary</code> (Grey), <code>Success</code> (Green), <code>Danger</code> (Red), and <code>Link</code> (opens URL).</li>
+            <li><strong>Select Menus</strong>: String select, User select, Role select, Channel select, and Mentionable select.</li>
+            <li><strong>Modal Forms</strong>: Pop-up text input dialogs supporting single-line inputs and multi-line paragraph inputs.</li>
+          </ul>
+        `,
+        code: {
+          rust: {
+            file: 'src/components.rs',
+            code: `use rift::prelude::*;
+
+pub async fn send_interactive_poll(ctx: &Context, question: &str) -> Result<(), RiftError> {
+    // 1. Build Action Row with Buttons
+    let row = ActionRow::new()
+        .button(Button::primary("btn_vote_yes", "Vote Yes 👍"))
+        .button(Button::danger("btn_vote_no", "Vote No 👎"))
+        .button(Button::secondary("btn_view_stats", "View Live Stats 📊"));
+
+    // 2. Send message with component attachment
+    ctx.reply_components(
+        format!("**Poll**: {}", question),
+        vec![row]
+    ).await?;
+
+    Ok(())
+}
+
+// Handling Modal submission
+pub async fn handle_modal_interaction(ctx: &Context) -> Result<(), RiftError> {
+    if ctx.custom_id() == "modal_feedback" {
+        let feedback_text = ctx.get_modal_value("feedback_input")?;
+        ctx.reply_ephemeral(format!("Thank you for submitting feedback: '{}'", feedback_text)).await?;
+    }
+    Ok(())
+}`
+          },
+          ts: {
+            file: 'src/components.ts',
+            code: `import { RiftClient } from 'rift-discord';
+
+export async function sendButtonMessage(client: RiftClient, channelId: string) {
+  const components = [
+    {
+      type: 1, // ACTION_ROW
+      components: [
+        { type: 2, style: 1, custom_id: 'btn_yes', label: 'Approve ✅' },
+        { type: 2, style: 4, custom_id: 'btn_no', label: 'Reject ❌' }
+      ]
+    }
+  ];
+
+  await client.rest.createMessage(channelId, {
+    content: 'Security verification required:',
+    components
+  });
+}`
+          },
+          py: {
+            file: 'src/components.py',
+            code: `from rift import RiftClient
+
+async def send_interactive_dialog(client: RiftClient, channel_id: str):
+    components = [
+        {
+            "type": 1, # ActionRow
+            "components": [
+                {"type": 2, "style": 3, "custom_id": "accept_tos", "label": "Accept Rules 📜"},
+                {"type": 2, "style": 2, "custom_id": "view_privacy", "label": "Privacy Policy"}
+            ]
+        }
+    ]
+
+    await client.rest.create_message(channel_id, {
+        "content": "Please review the server rules before posting:",
+        "components": components
+    })`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Custom ID Convention</h3>
+          <p class="guide-p">
+            Always format your <code>custom_id</code> with namespaces (e.g. <code>poll:123:vote_yes</code>). This allows stateless routers to parse arguments directly from the ID without maintaining server-side state.
+          </p>
+        `
+      },
+      {
+        id: 'gateway-sharding',
+        num: '04',
+        icon: '🛡️',
+        shortTitle: 'Gateway & Sharding',
+        title: 'Chapter 4: Gateway Runtime, Sharding & Resiliency',
+        readTime: '5 min read',
+        summary: 'Understand Rift’s pure sans-I/O state machine, automated multi-shard supervisors, continuous zstd-stream decompression, and backpressure policies under extreme event spikes.',
+        callout: {
+          type: 'warning',
+          title: 'Daily Identify Reserve Protection',
+          text: 'Discord permits a maximum of 1,000 identifies per 24-hour period per bot token. Rift includes a hard-coded identify reserve manager that will proactively block startup if your remaining token budget drops below 5%, preventing accidental token revocations.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">The Sans-I/O Advantage</h3>
+          <p class="guide-p">
+            Unlike traditional bot libraries that tightly couple WebSocket network I/O with protocol logic, Rift uses a 100% <strong>sans-I/O</strong> architecture.
+            The protocol engine (<code>rift-gateway</code>) is a pure, deterministic state machine that takes incoming bytes in and yields outgoing action directives (Heartbeat, Send, Identify, Resume, Reconnect) out.
+          </p>
+
+          <h3 class="guide-h3">Throughput & Compression</h3>
+          <p class="guide-p">
+            Rift connects using <strong>Gateway v10 with stateful zstd-stream</strong> compression. Decompression contexts are preserved across sequential frames, providing a <strong>19.5x wire bandwidth reduction</strong> (7.6 MB compressed down to 0.4 MB on typical Discord traffic) while maintaining 447k events/sec raw throughput.
+          </p>
+        `,
+        code: {
+          rust: {
+            file: 'src/sharding.rs',
+            code: `use rift::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let token = std::env::var("DISCORD_TOKEN")?;
+
+    // Configure Sharding Supervisor
+    let client = Client::builder(token, Intents::all())
+        // Explicitly set shard range or let Rift auto-discover from /gateway/bot
+        .shards(0..4, 4)
+        // Configure backpressure policy
+        .event_buffer_policy(EventBufferPolicy::Bounded {
+            capacity: 2000,
+            on_full: BackpressureAction::DropOldest
+        })
+        .build()
+        .await?;
+
+    println!("⚡ Supervisor launched 4 shards across 5-second identify waves.");
+    
+    // Event loop
+    while let Some(event) = client.next_event().await {
+        match event {
+            RuntimeEvent::Dispatch { shard_id, name, .. } => {
+                // Microsecond event routing
+            }
+            RuntimeEvent::ShardStatus { shard_id, status } => {
+                println!("[Shard #{}] Status transition: {:?}", shard_id, status);
+            }
+        }
+    }
+
+    Ok(())
+}`
+          },
+          ts: {
+            file: 'src/sharding.ts',
+            code: `import { RiftClient, Intents } from 'rift-discord';
+
+const client = new RiftClient({
+  token: process.env.DISCORD_TOKEN!,
+  intents: Intents.GUILDS | Intents.GUILD_MESSAGES,
+  shards: [0, 2], // Shard 0 of 2
+});
+
+client.on('SHARD_READY', ({ shardId }) => {
+  console.log(\`⚡ Shard #\${shardId} successfully resumed session.\`);
+});
+
+client.connect();`
+          },
+          py: {
+            file: 'src/sharding.py',
+            code: `from rift import RiftClient, Intents
+
+client = RiftClient(
+    token="YOUR_TOKEN",
+    intents=Intents.GUILDS | Intents.GUILD_MESSAGES,
+    shard_count=2,
+    shard_id=0
+)`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Backpressure Management</h3>
+          <p class="guide-p">
+            During raid attacks or large guild chunking, message queues can fill rapidly. Rift allows you to select between <code>Unbounded</code> (infinite queue) and <code>Bounded { capacity, DropOldest }</code> to guarantee your bot process never runs out of memory under adversarial load.
+          </p>
+        `
+      },
+      {
+        id: 'cache-permissions',
+        num: '05',
+        icon: '💾',
+        shortTitle: 'State Cache & Perms',
+        title: 'Chapter 5: State Cache & Nov 16 Obfuscation Safety',
+        readTime: '5 min read',
+        summary: 'Safely maintain in-memory guild and member state with bounded ring-buffer memory reclamation and calculate real-time bitwise Discord permissions with Channel Obfuscation safety.',
+        callout: {
+          type: 'warning',
+          title: 'Discord Nov 16 Channel Obfuscation',
+          text: 'Under Discord’s CHANNEL_OBFUSCATION specification, channels with restricted visibility omit channel names, topic, and parent IDs in certain payloads. Rift’s Cache explicitly isolates obfuscated channel nodes and returns None on permission resolution to prevent metadata leaks.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">Effective Permission Hierarchy</h3>
+          <p class="guide-p">
+            Calculating effective Discord permissions accurately requires following Discord’s exact evaluation chain:
+          </p>
+          <ol class="guide-list">
+            <li><strong>Guild Owner Check</strong>: The owner of the guild bypasses all restrictions and possesses all permissions unconditionally.</li>
+            <li><strong>Administrator Role Check</strong>: Any role holding the <code>ADMINISTRATOR</code> bit grants all permissions.</li>
+            <li><strong>Base Role Permissions</strong>: Start with the guild's <code>@everyone</code> role bitmask.</li>
+            <li><strong>Member Roles Allow/Deny</strong>: Union the bitmasks of all roles held by the member.</li>
+            <li><strong>Channel Overwrites (@everyone)</strong>: Apply channel-level allow and deny bits for <code>@everyone</code>.</li>
+            <li><strong>Channel Overwrites (Member Roles)</strong>: Apply role-specific allow and deny overwrites.</li>
+            <li><strong>Channel Overwrites (Member Specific)</strong>: Apply direct member-specific allow and deny overwrites.</li>
+            <li><strong>Timeout Restricton</strong>: If the member is currently timed out, all voice/chat permissions except <code>VIEW_CHANNEL</code> and <code>READ_MESSAGE_HISTORY</code> are cleared.</li>
+          </ol>
+        `,
+        code: {
+          rust: {
+            file: 'src/cache.rs',
+            code: `use rift::prelude::*;
+use rift_cache::{Cache, CacheConfig};
+
+fn evaluate_security(cache: &Cache, guild_id: Snowflake, channel_id: Snowflake, user_id: Snowflake) {
+    // Calculate effective permissions in under 1 microsecond
+    match cache.effective_permissions(guild_id, channel_id, user_id) {
+        Some(permissions) => {
+            if permissions.contains(Permissions::ADMINISTRATOR) {
+                println!("User is Server Administrator!");
+            }
+            if permissions.contains(Permissions::SEND_MESSAGES | Permissions::ATTACH_FILES) {
+                println!("User can post media in this channel.");
+            }
+        }
+        None => {
+            // Obfuscated channel or channel missing from memory
+            println!("Channel is obfuscated or unviewable by member.");
+        }
+    }
+}`
+          },
+          ts: {
+            file: 'src/cache.ts',
+            code: `import { Permissions } from 'rift-discord';
+
+// Calculate permissions bitmask
+const bitmask = Permissions.ADMINISTRATOR | Permissions.MANAGE_CHANNELS | Permissions.SEND_MESSAGES;
+
+// Check if bitmask has permission
+const canManage = Permissions.hasPermission(bitmask, Permissions.MANAGE_CHANNELS);
+console.log('Can manage channels:', canManage); // true`
+          },
+          py: {
+            file: 'src/cache.py',
+            code: `from rift import Permissions
+
+# Decode bitwise permission integer
+perms = Permissions.ADMINISTRATOR | Permissions.BAN_MEMBERS
+has_admin = Permissions.has_permission(perms, Permissions.ADMINISTRATOR)
+print("Has admin:", has_admin)`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Memory Bounds</h3>
+          <p class="guide-p">
+            Rift uses FIFO ring buffers with memory recycling. A bot operating in 5,000 servers uses less than 120 KB per shard for state tracking, compared to 200 MB+ in traditional libraries.
+          </p>
+        `
+      },
+      {
+        id: 'rest-webhooks',
+        num: '06',
+        icon: '🌐',
+        shortTitle: 'REST & Webhooks',
+        title: 'Chapter 6: 250/250 REST Operations & Webhook Signatures',
+        readTime: '4 min read',
+        summary: 'Explore full 100% Discord OpenAPI 3.1 REST route coverage, automatic per-route rate limiting, multipart file uploads, and serverless Ed25519 webhook signature validation.',
+        callout: {
+          type: 'tip',
+          title: 'Cloudflare Circuit Breaker',
+          text: 'Rift monitors 401, 403, and 429 response codes across all outbound requests. If a threshold is reached, Rift proactively triggers an internal circuit breaker to prevent Discord and Cloudflare from banning your bot host IP.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">100% Spec Coverage</h3>
+          <p class="guide-p">
+            Rift implements all <strong>250 out of 250 REST operations</strong> in Discord's OpenAPI 3.1 specification. Every route features automatic local parameter validation, path bucket hashing, and exponential retry backoffs.
+          </p>
+
+          <h3 class="guide-h3">Serverless Ed25519 Verification</h3>
+          <p class="guide-p">
+            When running Discord bots as HTTP Interaction webhooks (e.g. AWS Lambda, Cloudflare Workers, Vercel), Discord sends cryptographic Ed25519 signatures in the request headers (<code>X-Signature-Ed25519</code> and <code>X-Signature-Timestamp</code>). Rift provides zero-dependency, constant-time signature verification.
+          </p>
+        `,
+        code: {
+          rust: {
+            file: 'src/rest_and_webhooks.rs',
+            code: `use rift::prelude::*;
+use rift_http::verify_interaction;
+
+// 1. Send REST message with rich embeds & attachments
+async fn send_announcement(client: &Client, channel_id: Snowflake) -> Result<(), RiftError> {
+    let embed = EmbedBuilder::new()
+        .title("⚡ Rift v0.2.0 Released")
+        .description("447k ev/s throughput with 100% REST coverage!")
+        .color(0x6366f1)
+        .field("Throughput", "447,035 ev/s", true)
+        .field("Latency p50", "0.10 µs", true)
+        .build();
+
+    client.rest()
+        .create_message(channel_id)
+        .content("New release announcement:")
+        .embed(embed)
+        .send()
+        .await?;
+
+    Ok(())
+}
+
+// 2. Serverless Webhook Signature Validation (Cloudflare Worker / Lambda)
+fn validate_incoming_request(public_key_hex: &str, signature_hex: &str, timestamp: &str, body: &[u8]) -> bool {
+    verify_interaction(public_key_hex, signature_hex, timestamp, body)
+}`
+          },
+          ts: {
+            file: 'src/webhook.ts',
+            code: `import { verifyInteraction } from 'rift-discord';
+
+// Validate HTTP Interaction in Cloudflare Worker or Express
+export function handleDiscordWebhook(req: Request, publicKey: string): boolean {
+  const signature = req.headers.get('x-signature-ed25519') ?? '';
+  const timestamp = req.headers.get('x-signature-timestamp') ?? '';
+  const bodyText = req.body ?? '';
+
+  return verifyInteraction(publicKey, signature, timestamp, bodyText);
+}`
+          },
+          py: {
+            file: 'src/webhook.py',
+            code: `from rift import verify_interaction
+
+def authenticate_webhook(pubkey: str, signature: str, timestamp: str, body: bytes) -> bool:
+    return verify_interaction(pubkey, signature, timestamp, body)`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Bucket Hashes</h3>
+          <p class="guide-p">
+            Discord groups rate limits into per-route buckets identified by returned <code>X-RateLimit-Bucket</code> headers. Rift tracks bucket remaining quotas and reset timestamps with zero mutex contention.
+          </p>
+        `
+      },
+      {
+        id: 'voice-audio',
+        num: '07',
+        icon: '🎙️',
+        shortTitle: 'Voice & DAVE',
+        title: 'Chapter 7: Voice Gateway v8 & DAVE MLS Audio',
+        readTime: '4 min read',
+        summary: 'Stream low-latency audio using sans-I/O Voice Gateway v8 framing, UDP IP discovery, XChaCha20-Poly1305 encryption, and modern Discord Audio & Video End-to-End Encryption (DAVE).',
+        callout: {
+          type: 'tip',
+          title: 'Discord Audio & Video End-to-End Encryption (DAVE)',
+          text: 'Rift implements the MLS (Messaging Layer Security) opcodes and epoch key transitions required by Discord’s DAVE audio encryption standard.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">Voice Pipeline Overview</h3>
+          <p class="guide-p">Connecting to a Discord voice channel consists of four phases:</p>
+          <ol class="guide-list">
+            <li><strong>Gateway Handshake</strong>: Send Opcode 4 (Voice State Update) on the main Gateway to request an endpoint and token.</li>
+            <li><strong>Voice Gateway v8 Connection</strong>: Establish a WebSocket session with the voice server, exchange speaking credentials, and receive UDP IP/port details.</li>
+            <li><strong>UDP IP Discovery</strong>: Send a 74-byte packet to discover the bot’s public reflexive IP and port for NAT traversal.</li>
+            <li><strong>RTP Audio Framing</strong>: Encode audio frames with Opus, wrap in an RTP header with sequence and timestamp tracking, and encrypt via XChaCha20-Poly1305 or ChaCha20-Poly1305 AEAD.</li>
+          </ol>
+        `,
+        code: {
+          rust: {
+            file: 'src/voice.rs',
+            code: `use rift::prelude::*;
+use rift_voice::{VoiceSession, VoiceConfig, EncryptionMode};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // 1. Configure sans-I/O Voice Session
+    let mut session = VoiceSession::new(VoiceConfig {
+        guild_id: Snowflake::new(123456789),
+        user_id: Snowflake::new(987654321),
+        session_id: "session_token".to_string(),
+        token: "voice_gateway_token".to_string(),
+        preferred_encryption: EncryptionMode::AEAD_XCHACHA20_POLY1305_RTPSIZE,
+    });
+
+    // 2. Feed voice frames in and receive encrypted RTP packets
+    println!("Voice session initialized with DAVE MLS support.");
+    Ok(())
+}`
+          },
+          ts: {
+            file: 'src/voice.ts',
+            code: `// Voice Gateway v8 integration with Rift
+import { RiftClient } from 'rift-discord';
+
+const client = new RiftClient({ token: process.env.DISCORD_TOKEN! });
+// Connect to voice channel and route RTP frames`
+          },
+          py: {
+            file: 'src/voice.py',
+            code: `# Voice session in Python via Rift
+from rift import RiftClient
+
+client = RiftClient(token="YOUR_TOKEN")
+# Send Opcode 4 to join voice channel`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Audio Encryption Ciphers</h3>
+          <p class="guide-p">
+            Rift includes clean, constant-time, zero-dependency implementations of RFC 8439 ChaCha20-Poly1305 and XChaCha20-Poly1305 to ensure audio streams have zero timing side-channels.
+          </p>
+        `
+      },
+      {
+        id: 'ai-mcp',
+        num: '08',
+        icon: '🤖',
+        shortTitle: 'AI & MCP Server',
+        title: 'Chapter 8: AI Agent Integration (Cursor, Claude, Antigravity)',
+        readTime: '4 min read',
+        summary: 'Equip your AI pair-programmer or autonomous coding agent with real-time Discord documentation queries, automated bot scaffolding, and bitwise permission math via the official Rift MCP server.',
+        callout: {
+          type: 'tip',
+          title: 'Remote MCP Endpoint',
+          text: 'The Rift MCP server is hosted globally on Cloudflare Workers at https://rift-mcp.i-s41m0011.workers.dev/mcp. You do not need to compile or run local background processes.'
+        },
+        bodyHtml: `
+          <h3 class="guide-h3">What is Model Context Protocol (MCP)?</h3>
+          <p class="guide-p">
+            MCP allows AI coding tools (Claude Desktop, Cursor, Antigravity, Windsurf) to securely invoke structured tools to inspect documentation and validate code against live Discord OpenAPI specs before generating output.
+          </p>
+
+          <h3 class="guide-h3">Available Rift MCP Tools</h3>
+          <ul class="guide-list">
+            <li><code>search_docs</code>: Query Discord OpenAPI routes, type definitions, and rate limit rules.</li>
+            <li><code>generate_bot</code>: Scaffold complete, zero-unsafe bots in Rust, TypeScript, Bun, or Python.</li>
+            <li><code>calculate_permissions</code>: Encode and decode Discord permission bitmasks with human-readable explanations.</li>
+            <li><code>validate_intents</code>: Audit a bot's required Gateway Intents to determine whether Privileged Intents are needed.</li>
+          </ul>
+        `,
+        code: {
+          rust: {
+            file: 'claude_desktop_config.json',
+            code: `{
+  "mcpServers": {
+    "rift-discord": {
+      "command": "npx",
+      "args": ["-y", "mcp-proxy", "https://rift-mcp.i-s41m0011.workers.dev/mcp"]
+    }
+  }
+}`
+          },
+          ts: {
+            file: '.cursor/mcp.json',
+            code: `{
+  "mcpServers": {
+    "rift": {
+      "url": "https://rift-mcp.i-s41m0011.workers.dev/mcp"
+    }
+  }
+}`
+          },
+          py: {
+            file: 'agent_script.py',
+            code: `import httpx
+import json
+
+# Direct JSON-RPC 2.0 query to Rift MCP
+response = httpx.post(
+    "https://rift-mcp.i-s41m0011.workers.dev/mcp",
+    json={
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "tools/call",
+        "params": {
+            "name": "calculate_permissions",
+            "arguments": {"permissions": ["ADMINISTRATOR", "MANAGE_CHANNELS"]}
+        }
+    }
+)
+print(response.json())`
+          }
+        },
+        deepDiveHtml: `
+          <h3 class="guide-h3">Pair Programming Recipe</h3>
+          <p class="guide-p">
+            Ask your AI assistant: <em>"Using the rift-discord MCP tool, generate a slash command bot in Rust that bans raiders and calculate the bitmask permissions needed for the invite link."</em>
+          </p>
+        `
+      }
+    ];
+
+    // State
+    let activeChapterIndex = 0;
+    let activeGuideLang = 'rust';
+
+    function initGuides() {
+      renderSidebar();
+      renderActiveChapter();
+
+      // Check URL hash for direct deep links e.g. #guides/slash-commands
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#guides/')) {
+        const targetId = hash.replace('#guides/', '');
+        const idx = guideChapters.findIndex(c => c.id === targetId);
+        if (idx !== -1) {
+          activeChapterIndex = idx;
+          renderSidebar();
+          renderActiveChapter();
+        }
+      }
+    }
+
+    function renderSidebar(filteredList = null) {
+      const sidebar = document.getElementById('guide-sidebar');
+      if (!sidebar) return;
+
+      const list = filteredList || guideChapters;
+      sidebar.innerHTML = list.map((chap) => {
+        const origIndex = guideChapters.findIndex(c => c.id === chap.id);
+        const isActive = origIndex === activeChapterIndex;
+        return `
+          <div class="guide-nav-item ${isActive ? 'active' : ''}" onclick="selectGuideChapter(${origIndex})">
+            <span class="chapter-num">${chap.num}</span>
+            <span style="display:flex; align-items:center; gap:0.4rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <span>${chap.icon}</span>
+              <span>${chap.shortTitle}</span>
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectGuideChapter(index) {
+      if (index < 0 || index >= guideChapters.length) return;
+      activeChapterIndex = index;
+      renderSidebar();
+      renderActiveChapter();
+      
+      const chap = guideChapters[index];
+      if (history.pushState) {
+        history.pushState(null, null, '#guides/' + chap.id);
+      }
+      
+      const article = document.getElementById('guide-article');
+      if (article && window.innerWidth < 900) {
+        article.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function renderActiveChapter() {
+      const chap = guideChapters[activeChapterIndex];
+      if (!chap) return;
+
+      document.getElementById('guide-chap-badge').textContent = `Chapter ${chap.num}`;
+      document.getElementById('guide-read-time').textContent = chap.readTime;
+      document.getElementById('guide-title').textContent = chap.title;
+      document.getElementById('guide-summary').textContent = chap.summary;
+
+      // Callout
+      const calloutEl = document.getElementById('guide-callout');
+      calloutEl.className = `guide-callout ${chap.callout.type || ''}`;
+      document.getElementById('guide-callout-title').textContent = chap.callout.title;
+      document.getElementById('guide-callout-text').textContent = chap.callout.text;
+
+      // Body HTML & Deep Dive HTML
+      document.getElementById('guide-body-html').innerHTML = chap.bodyHtml;
+      document.getElementById('guide-deep-dive-html').innerHTML = chap.deepDiveHtml || '';
+
+      // Code Display
+      updateGuideCodeDisplay();
+
+      // Pagination
+      const prevBtn = document.getElementById('guide-prev-btn');
+      const nextBtn = document.getElementById('guide-next-btn');
+      const indicator = document.getElementById('guide-page-indicator');
+
+      indicator.textContent = `Chapter ${activeChapterIndex + 1} of ${guideChapters.length}`;
+      if (activeChapterIndex === 0) {
+        prevBtn.classList.add('disabled');
+      } else {
+        prevBtn.classList.remove('disabled');
+        prevBtn.textContent = `← ${guideChapters[activeChapterIndex - 1].shortTitle}`;
+      }
+
+      if (activeChapterIndex === guideChapters.length - 1) {
+        nextBtn.classList.add('disabled');
+      } else {
+        nextBtn.classList.remove('disabled');
+        nextBtn.textContent = `${guideChapters[activeChapterIndex + 1].shortTitle} →`;
+      }
+    }
+
+    function updateGuideCodeDisplay() {
+      const chap = guideChapters[activeChapterIndex];
+      if (!chap || !chap.code) return;
+
+      const codeObj = chap.code[activeGuideLang] || chap.code['rust'];
+      document.getElementById('guide-code-file').textContent = codeObj.file;
+      document.getElementById('guide-code-display').textContent = codeObj.code;
+    }
+
+    function setGuideLang(lang) {
+      activeGuideLang = lang;
+      document.querySelectorAll('.guide-lang-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`glang-${lang}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      updateGuideCodeDisplay();
+    }
+
+    function filterGuideChapters(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        renderSidebar();
+        return;
+      }
+      const filtered = guideChapters.filter(c => 
+        c.shortTitle.toLowerCase().includes(q) || 
+        c.title.toLowerCase().includes(q) || 
+        c.summary.toLowerCase().includes(q)
+      );
+      renderSidebar(filtered);
+    }
+
+    function navigateGuide(delta) {
+      selectGuideChapter(activeChapterIndex + delta);
+    }
+
+    function copyActiveGuideCode() {
+      const codeText = document.getElementById('guide-code-display').textContent;
+      navigator.clipboard.writeText(codeText).then(() => {
+        showToast("Copied guide code snippet! ⚡");
+      });
+    }
+
+    // Auto-init on load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGuides);
+    } else {
+      initGuides();
+    }
+  </script>
+
 </body>
 </html>
