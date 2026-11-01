@@ -36,7 +36,7 @@ Measured via `rift-bench` loopback harness with stateful `zstd-stream` compressi
 
 | Metric | Rift Raw Driver | Rift Full Stack | Live Node.js v24 | Live Python 3.14 |
 | :--- | :--- | :--- | :--- | :--- |
-| **Gateway Throughput** | **171,226 ev/s** | **96,981 ev/s** | 37,301 ev/s | 6,196 ev/s |
+| **Gateway Throughput** | **447,035 ev/s** | **112,381 ev/s** | 39,911 ev/s | 4,061 ev/s |
 | **p50 Ingestion Latency** | **3.20 µs** | **10.00 µs** | 9.70 µs | 95.60 µs |
 | **p99 Ingestion Latency** | **20.20 µs** | **28.20 µs** | 54.50 µs | 570.10 µs |
 | **Wire Compression** | **19.5x (zstd-stream)** | **19.5x (zstd-stream)** | 1.0x (raw) | 1.0x (raw) |

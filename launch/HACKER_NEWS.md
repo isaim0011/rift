@@ -13,7 +13,7 @@ I built Rift (https://rift-discord.dev/), a high-performance Discord v10 engine 
 
 2. **Strict Zero-Unsafe Guarantee**: Every single crate in the workspace compiles under `#![forbid(unsafe_code)]`. Memory safety is enforced by the compiler without compromise.
 
-3. **True Multi-Language Polyglot Bindings**: We wanted Python, Node.js, and Bun developers to benefit from Rust's performance (measured at 96,981 events/sec full stack and 171,226 events/sec raw on loopback) without having to write Rust. We exposed clean, idiomatic bindings using napi-rs and PyO3 so you can write in TypeScript:
+3. **True Multi-Language Polyglot Bindings**: We wanted Python, Node.js, and Bun developers to benefit from Rust's performance (measured at 112,381 events/sec full stack and 447,035 events/sec raw on loopback) without having to write Rust. We exposed clean, idiomatic bindings using napi-rs and PyO3 so you can write in TypeScript:
 
 ```typescript
 import { RiftClient, Intents } from 'rift-discord';

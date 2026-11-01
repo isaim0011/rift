@@ -9,6 +9,7 @@ use rift_gateway::{
     BudgetError, Disconnect, HeartbeatAction, IdentifyBudget, ReconnectPlan, SendError,
     SendLimiter, Session,
 };
+use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, Visitor};
 use serde::Deserialize;
 use serde_json::json;
 use serde_json::value::RawValue;
@@ -108,6 +109,48 @@ impl EventSender {
             SenderInner::Unbounded(tx) => tx.send(event).map_err(|e| EventSendError(e.0)),
         }
     }
+
+    /// Send a batch of events according to the channel's configured [`EventBufferPolicy`](crate::EventBufferPolicy).
+    pub(crate) fn send_batch(&self, events: &mut Vec<Event>) -> Result<(), EventSendError<()>> {
+        if events.is_empty() {
+            return Ok(());
+        }
+        match &self.inner {
+            SenderInner::Queue(shared) => {
+                let mut guard = shared.state.lock().unwrap_or_else(|e| e.into_inner());
+                if guard.closed {
+                    events.clear();
+                    return Err(EventSendError(()));
+                }
+                match guard.policy {
+                    crate::config::EventBufferPolicy::Unbounded => {
+                        guard.queue.extend(events.drain(..));
+                        shared.notify.notify_one();
+                    }
+                    crate::config::EventBufferPolicy::Bounded { capacity, drop_oldest } => {
+                        for ev in events.drain(..) {
+                            if guard.queue.len() < capacity {
+                                guard.queue.push_back(ev);
+                            } else if drop_oldest {
+                                guard.queue.pop_front();
+                                guard.queue.push_back(ev);
+                            }
+                        }
+                        shared.notify.notify_one();
+                    }
+                }
+                Ok(())
+            }
+            SenderInner::Unbounded(tx) => {
+                for ev in events.drain(..) {
+                    if tx.send(ev).is_err() {
+                        return Err(EventSendError(()));
+                    }
+                }
+                Ok(())
+            }
+        }
+    }
 }
 
 impl From<mpsc::UnboundedSender<Event>> for EventSender {
@@ -149,11 +192,7 @@ impl EventReceiver {
             {
                 let mut guard = self.inner.state.lock().unwrap_or_else(|e| e.into_inner());
                 if !guard.queue.is_empty() {
-                    if guard.queue.len() <= 64 {
-                        std::mem::swap(&mut self.local, &mut guard.queue);
-                    } else {
-                        self.local.extend(guard.queue.drain(..64));
-                    }
+                    std::mem::swap(&mut self.local, &mut guard.queue);
                     return self.local.pop_front();
                 }
                 if guard.closed || Arc::strong_count(&self.inner) <= 1 {
@@ -191,6 +230,96 @@ pub fn event_channel(policy: crate::config::EventBufferPolicy) -> (EventSender, 
 
 /// Identify budget shared by all shards of one bot.
 pub type SharedBudget = Arc<Mutex<IdentifyBudget>>;
+
+const RAW_VALUE_TOKEN: &str = "$serde_json::private::RawValue";
+
+struct RawValueDeserializer<'a>(&'a str);
+
+impl<'de, 'a> Deserializer<'de> for RawValueDeserializer<'a> {
+    type Error = de::value::Error;
+
+    fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
+        self.deserialize_newtype_struct(RAW_VALUE_TOKEN, visitor)
+    }
+
+    fn deserialize_newtype_struct<V: Visitor<'de>>(
+        self,
+        _name: &'static str,
+        visitor: V,
+    ) -> Result<V::Value, Self::Error> {
+        visitor.visit_map(RawValueMapAccess(Some(self.0)))
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct seq tuple
+        tuple_struct map struct enum identifier ignored_any
+    }
+}
+
+struct RawValueMapAccess<'a>(Option<&'a str>);
+
+impl<'de, 'a> MapAccess<'de> for RawValueMapAccess<'a> {
+    type Error = de::value::Error;
+
+    fn next_key_seed<K: DeserializeSeed<'de>>(&mut self, seed: K) -> Result<Option<K::Value>, Self::Error> {
+        if self.0.is_some() {
+            seed.deserialize(RawKeyDeserializer).map(Some)
+        } else {
+            Ok(None)
+        }
+    }
+
+    fn next_value_seed<V: DeserializeSeed<'de>>(&mut self, seed: V) -> Result<V::Value, Self::Error> {
+        let s = self.0.take().unwrap();
+        seed.deserialize(RawStrDeserializer(s))
+    }
+}
+
+struct RawKeyDeserializer;
+
+impl<'de> Deserializer<'de> for RawKeyDeserializer {
+    type Error = de::value::Error;
+
+    fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
+        visitor.visit_str(RAW_VALUE_TOKEN)
+    }
+
+    fn deserialize_identifier<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
+        visitor.visit_str(RAW_VALUE_TOKEN)
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+        bytes byte_buf option unit unit_struct seq tuple
+        tuple_struct map struct enum newtype_struct ignored_any
+    }
+}
+
+struct RawStrDeserializer<'a>(&'a str);
+
+impl<'de, 'a> Deserializer<'de> for RawStrDeserializer<'a> {
+    type Error = de::value::Error;
+
+    fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
+        visitor.visit_str(self.0)
+    }
+
+    fn deserialize_str<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
+        visitor.visit_str(self.0)
+    }
+
+    serde::forward_to_deserialize_any! {
+        bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char string
+        bytes byte_buf option unit unit_struct seq tuple
+        tuple_struct map struct enum newtype_struct identifier ignored_any
+    }
+}
+
+#[inline(always)]
+fn raw_value_from_str(s: &str) -> Option<Box<RawValue>> {
+    serde::Deserialize::deserialize(RawValueDeserializer(s)).ok()
+}
 
 /// Milliseconds on a process-wide monotonic clock. Seed budgets with this.
 pub fn now_ms() -> u64 {
@@ -378,9 +507,11 @@ async fn run_connection(
     let mut decoder = StreamDecoder::new().map_err(|e| Error::Transport(e.to_string()))?;
     let mut limiter = SendLimiter::default();
     let mut pending: VecDeque<String> = VecDeque::new();
-    let sleep = tokio::time::sleep(Duration::from_millis(1_000));
+    let sleep = tokio::time::sleep(Duration::from_secs(86400));
     tokio::pin!(sleep);
-    let mut next_sleep_target = 0u64;
+    let mut next_sleep_target = u64::MAX;
+    let mut incoming_frames = Vec::with_capacity(1024);
+    let mut event_batch = Vec::with_capacity(512);
 
     loop {
         let now = now_ms();
@@ -421,12 +552,21 @@ async fn run_connection(
             }
         }
 
-        let hb_wait = session.heartbeat.next_due_ms().map(|d| d.saturating_sub(now));
-        let wait = [hb_wait, retry_ms].into_iter().flatten().min().unwrap_or(1_000);
-        let target = now + wait;
+        let target = match (session.heartbeat.next_due_ms(), retry_ms) {
+            (Some(hb), Some(r)) => hb.min(now + r),
+            (Some(hb), None) => hb,
+            (None, Some(r)) => now + r,
+            (None, None) => u64::MAX,
+        };
+
         if target != next_sleep_target {
             next_sleep_target = target;
-            sleep.as_mut().reset(tokio::time::Instant::now() + Duration::from_millis(wait));
+            if target == u64::MAX {
+                sleep.as_mut().reset(tokio::time::Instant::now() + Duration::from_secs(86400));
+            } else {
+                let wait_ms = target.saturating_sub(now);
+                sleep.as_mut().reset(tokio::time::Instant::now() + Duration::from_millis(wait_ms));
+            }
         }
 
         tokio::select! {
@@ -446,33 +586,47 @@ async fn run_connection(
                     &resume,
                     ready_seen,
                     now,
+                    &mut event_batch,
                 ).await? {
                     return Ok(outcome);
                 }
 
-                // Batch drain any immediately buffered frames from transport
-                let mut burst = 0;
-                while burst < 64 {
-                    match rx.try_recv() {
-                        Some(Ok(f)) => {
-                            if let Some(outcome) = handle_one_frame(
-                                f,
-                                &mut decoder,
-                                ctx,
-                                session,
-                                tx,
-                                &mut limiter,
-                                &resume,
-                                ready_seen,
-                                now,
-                            ).await? {
-                                return Ok(outcome);
-                            }
-                            burst += 1;
-                        }
-                        Some(Err(_)) => return lost(),
-                        None => break,
+                // Batch drain all immediately buffered frames from transport in a tight loop
+                loop {
+                    incoming_frames.clear();
+                    if rx.try_recv_batch(&mut incoming_frames, 1024).is_err() {
+                        return lost();
                     }
+                    if incoming_frames.is_empty() {
+                        break;
+                    }
+
+                    for f in incoming_frames.drain(..) {
+                        if let Some(outcome) = handle_one_frame(
+                            f,
+                            &mut decoder,
+                            ctx,
+                            session,
+                            tx,
+                            &mut limiter,
+                            &resume,
+                            ready_seen,
+                            now,
+                            &mut event_batch,
+                        ).await? {
+                            return Ok(outcome);
+                        }
+                    }
+
+                    if event_batch.len() >= 512 && ctx.events.send_batch(&mut event_batch).is_err() {
+                        tx.close().await;
+                        return Ok(Outcome::Shutdown);
+                    }
+                }
+
+                if !event_batch.is_empty() && ctx.events.send_batch(&mut event_batch).is_err() {
+                    tx.close().await;
+                    return Ok(Outcome::Shutdown);
                 }
             }
             cmd = commands.recv(), if pending.len() < MAX_PENDING_COMMANDS => {
@@ -500,6 +654,7 @@ async fn handle_one_frame(
     resume: &Option<(String, u64)>,
     ready_seen: &mut bool,
     now: u64,
+    batch: &mut Vec<Event>,
 ) -> Result<Option<Outcome>, Error> {
     let bytes: &[u8] = match &frame {
         Frame::Binary(b) => match decoder.decode(b) {
@@ -589,6 +744,32 @@ async fn handle_one_frame(
                 session.heartbeat.record_seq(s);
             }
             let name = parsed.name.unwrap_or("");
+            if name != "READY" && name != "RESUMED" {
+                let keep = match &ctx.config.event_filter {
+                    None => true,
+                    Some(f) => f.contains(name),
+                };
+                if keep {
+                    if let (Some(d), Some(seq)) = (parsed.data, parsed.seq) {
+                        let raw_data = match raw_value_from_str(d) {
+                            Some(rd) => rd,
+                            None => return Ok(None),
+                        };
+                        batch.push(Event {
+                            shard_id: ctx.config.shard_id,
+                            name: name.to_owned(),
+                            seq,
+                            data: raw_data,
+                        });
+                        if batch.len() >= 512 && ctx.events.send_batch(batch).is_err() {
+                            tx.close().await;
+                            return Ok(Some(Outcome::Shutdown));
+                        }
+                    }
+                }
+                return Ok(None);
+            }
+
             if name == "READY" {
                 if let Some(d) = parsed.data {
                     if let Ok(r) = serde_json::from_str::<Ready>(d) {
@@ -609,27 +790,20 @@ async fn handle_one_frame(
                     "shard session successfully RESUMED"
                 );
             }
-            let keep = match &ctx.config.event_filter {
-                None => true,
-                Some(f) => name == "READY" || name == "RESUMED" || f.contains(name),
-            };
-            if keep {
-                if let (Some(d), Some(seq)) = (parsed.data, parsed.seq) {
-                    let raw_data = match RawValue::from_string(d.to_owned()) {
-                        Ok(rd) => rd,
-                        Err(_) => return Ok(None),
-                    };
-                    let ev = Event {
-                        shard_id: ctx.config.shard_id,
-                        name: name.to_owned(),
-                        seq,
-                        data: raw_data,
-                    };
-                    if ctx.events.send(ev).is_err() {
-                        // Consumer is gone: shut down cleanly.
-                        tx.close().await;
-                        return Ok(Some(Outcome::Shutdown));
-                    }
+            if let (Some(d), Some(seq)) = (parsed.data, parsed.seq) {
+                let raw_data = match raw_value_from_str(d) {
+                    Some(rd) => rd,
+                    None => return Ok(None),
+                };
+                batch.push(Event {
+                    shard_id: ctx.config.shard_id,
+                    name: name.to_owned(),
+                    seq,
+                    data: raw_data,
+                });
+                if batch.len() >= 512 && ctx.events.send_batch(batch).is_err() {
+                    tx.close().await;
+                    return Ok(Some(Outcome::Shutdown));
                 }
             }
         }
@@ -800,5 +974,13 @@ mod tests {
         let ev = rx.recv().await.unwrap();
         assert_eq!(ev.seq, 1);
         assert!(rx.recv().await.is_none());
+    }
+
+    #[test]
+    fn raw_value_from_str_matches_standard_raw_value() {
+        let json = r#"{"id":"123","nested":{"a":1,"b":true}}"#;
+        let expected = RawValue::from_string(json.to_string()).unwrap();
+        let fast = raw_value_from_str(json).unwrap();
+        assert_eq!(fast.get(), expected.get());
     }
 }

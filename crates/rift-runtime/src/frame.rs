@@ -71,13 +71,20 @@ impl<'a> Cursor<'a> {
         }
     }
 
+    #[inline(always)]
     fn ws(&mut self) {
-        while matches!(self.peek(), Some(b' ' | b'\n' | b'\r' | b'\t')) {
-            self.i += 1;
+        if let Some(&c) = self.b.get(self.i) {
+            if matches!(c, b' ' | b'\n' | b'\r' | b'\t') {
+                self.i += 1;
+                while matches!(self.peek(), Some(b' ' | b'\n' | b'\r' | b'\t')) {
+                    self.i += 1;
+                }
+            }
         }
     }
 
     /// Consume a literal `null` if present.
+    #[inline(always)]
     fn null(&mut self) -> bool {
         if self.b.get(self.i..).is_some_and(|r| r.starts_with(b"null")) {
             self.i += 4;
@@ -88,24 +95,25 @@ impl<'a> Cursor<'a> {
     }
 
     /// A string with no escapes. Declines (None) on a backslash or control byte.
+    #[inline(always)]
     fn plain_string(&mut self) -> Option<&'a [u8]> {
         self.eat(b'"')?;
         let start = self.i;
-        loop {
-            match *self.b.get(self.i)? {
-                b'"' => {
-                    let s = &self.b[start..self.i];
-                    self.i += 1;
-                    return Some(s);
+        if let Some(idx) = memchr::memchr2(b'"', b'\\', &self.b[self.i..]) {
+            if self.b[self.i + idx] == b'"' {
+                let s = &self.b[start..self.i + idx];
+                if s.iter().any(|&c| c < 0x20) {
+                    return None;
                 }
-                b'\\' => return None,
-                c if c < 0x20 => return None,
-                _ => self.i += 1,
+                self.i += idx + 1;
+                return Some(s);
             }
         }
+        None
     }
 
     /// A non-negative integer: no sign, fraction, exponent or leading zeros.
+    #[inline(always)]
     fn uint(&mut self) -> Option<u64> {
         let start = self.i;
         let mut v: u64 = 0;
@@ -124,15 +132,16 @@ impl<'a> Cursor<'a> {
 
     /// Skip the body of a string (after the opening quote).
     fn skip_string_body(&mut self) -> Option<()> {
-        loop {
-            match self.next()? {
-                b'\\' => {
-                    self.next()?;
-                }
-                b'"' => return Some(()),
-                _ => {}
+        while self.i < self.b.len() {
+            let idx = memchr::memchr2(b'"', b'\\', &self.b[self.i..])?;
+            if self.b[self.i + idx] == b'"' {
+                self.i += idx + 1;
+                return Some(());
             }
+            // Skip backslash and the escaped byte
+            self.i += idx + 2;
         }
+        None
     }
 
     /// Skip one JSON value structurally. Does not validate it.
@@ -175,6 +184,7 @@ impl<'a> Cursor<'a> {
 
 /// The fast path. `None` means "not sure", not "invalid".
 fn scan(b: &[u8]) -> Option<Parsed<'_>> {
+    let s = std::str::from_utf8(b).ok()?;
     let mut c = Cursor { b, i: 0 };
     c.ws();
     c.eat(b'{')?;
@@ -211,7 +221,8 @@ fn scan(b: &[u8]) -> Option<Parsed<'_>> {
                     return None;
                 }
                 if !c.null() {
-                    name = Some(std::str::from_utf8(c.plain_string()?).ok()?);
+                    let raw = c.plain_string()?;
+                    name = Some(std::str::from_utf8(raw).ok()?);
                 }
             }
             b"d" => {
@@ -220,9 +231,8 @@ fn scan(b: &[u8]) -> Option<Parsed<'_>> {
                 }
                 let start = c.i;
                 c.skip_value()?;
-                let raw = &b[start..c.i];
-                if raw != b"null" {
-                    data = Some(std::str::from_utf8(raw).ok()?);
+                if &b[start..c.i] != b"null" {
+                    data = s.get(start..c.i);
                 }
             }
             _ => c.skip_value()?,

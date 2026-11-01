@@ -8,7 +8,7 @@
 use std::io;
 use zstd::stream::raw::{Decoder, InBuffer, Operation, OutBuffer};
 
-const CHUNK: usize = 64 * 1024;
+const CHUNK: usize = 128 * 1024;
 
 /// Long-lived streaming zstd decoder preserving decompression context across WebSocket messages.
 pub struct StreamDecoder {
@@ -17,7 +17,7 @@ pub struct StreamDecoder {
 }
 
 impl StreamDecoder {
-    /// Creates a new streaming zstd decoder with a 64 KiB output buffer.
+    /// Creates a new streaming zstd decoder with a 128 KiB output buffer.
     pub fn new() -> io::Result<Self> {
         Ok(Self { dec: Decoder::new()?, out: Vec::with_capacity(CHUNK) })
     }
