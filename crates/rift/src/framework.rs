@@ -247,6 +247,23 @@ impl EventContext {
         data.value(custom_id).map(|s| s.to_string())
     }
 
+    /// Convenience alias to find a submitted modal text input value by component `custom_id`.
+    pub fn get_modal_value(&self, custom_id: &str) -> Option<String> {
+        self.modal_value(custom_id)
+    }
+
+    /// Extracts a string option value by option name.
+    pub fn get_string(&self, name: &str) -> Option<String> {
+        let cmd = self.command_data().ok()?;
+        let opt = cmd.option(name)?;
+        opt.as_str().map(|s| s.to_string())
+    }
+
+    /// Checks whether the invoking member has the given permission flag(s).
+    pub fn has_member_permission(&self, perm: Permissions) -> bool {
+        self.member_permissions().map(|p| p.contains(perm)).unwrap_or(false)
+    }
+
     /// Shared rate-limited REST client reference.
     pub fn rest(&self) -> &Arc<RestClient<ReqwestTransport>> {
         &self.rest
@@ -282,6 +299,25 @@ impl EventContext {
     /// Responds with a complete custom [`InteractionMessage`].
     pub async fn reply_message(&self, message: InteractionMessage) -> Result<(), rift_rest::Error> {
         self.respond(&InteractionResponse::message(message)).await
+    }
+
+    /// Sends a text reply with attached action rows (e.g. buttons, select menus).
+    pub async fn reply_components(
+        &self,
+        content: impl Into<String>,
+        components: impl IntoIterator<Item = ActionRow>,
+    ) -> Result<(), rift_rest::Error> {
+        let msg = InteractionMessage::new()
+            .content(content)
+            .action_rows(components)
+            .map_err(|e| rift_rest::Error::Decode(e.to_string()))?;
+        self.reply_message(msg).await
+    }
+
+    /// Edits the initial interaction response with text content within its 15-minute validity window.
+    pub async fn edit_reply(&self, content: impl Into<String>) -> Result<rift_rest::Message, rift_rest::Error> {
+        let msg = InteractionMessage::new().content(content);
+        self.edit_original(&msg).await
     }
 
     /// Defers the interaction response (`DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE`), showing a loading state.
@@ -1299,5 +1335,51 @@ mod tests {
         let res = router.dispatch_raw(&event, rest).await.unwrap();
         assert!(res);
         assert!(called.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn event_context_convenience_helpers() {
+        let ctx = make_ctx(
+            InteractionType::ApplicationCommand,
+            json!({
+                "id": "500",
+                "name": "search",
+                "type": 1,
+                "options": [
+                    {
+                        "name": "term",
+                        "type": 3,
+                        "value": "rust discord"
+                    }
+                ]
+            }),
+        );
+
+        assert_eq!(ctx.get_string("term"), Some("rust discord".to_string()));
+        assert_eq!(ctx.get_string("nonexistent"), None);
+        assert!(!ctx.has_member_permission(Permissions::ADMINISTRATOR));
+
+        let modal_ctx = make_ctx(
+            InteractionType::ModalSubmit,
+            json!({
+                "id": "600",
+                "custom_id": "feedback_modal",
+                "components": [
+                    {
+                        "type": 1,
+                        "components": [
+                            {
+                                "type": 4,
+                                "custom_id": "feedback_input",
+                                "value": "Great framework!"
+                            }
+                        ]
+                    }
+                ]
+            }),
+        );
+
+        assert_eq!(modal_ctx.get_modal_value("feedback_input"), Some("Great framework!".to_string()));
+        assert_eq!(modal_ctx.get_modal_value("missing"), None);
     }
 }

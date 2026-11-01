@@ -34,7 +34,7 @@ Writing in Rust shouldn't be mandatory to get systems-level speed. We built nati
 
 Measured via `rift-bench` loopback harness with stateful `zstd-stream` compression (Intel Core i5-6200U @ 2.30GHz, Windows 10, 10,000 Gateway v10 events):
 
-| Metric | Rift Raw Driver | Rift Full Stack | Live Node.js v24 | Live Python 3.14 |
+| Metric | Rift Raw Driver | Rift Full Stack | Live Node.js v24 | Live Python 3.13 |
 | :--- | :--- | :--- | :--- | :--- |
 | **Gateway Throughput** | **447,035 ev/s** | **112,381 ev/s** | 39,911 ev/s | 4,061 ev/s |
 | **p50 Ingestion Latency** | **3.20 µs** | **10.00 µs** | 9.70 µs | 95.60 µs |

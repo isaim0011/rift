@@ -1,6 +1,6 @@
 # Rift
 
-[![CI](https://github.com/rift-rs/rift/actions/workflows/ci.yml/badge.svg)](https://github.com/rift-rs/rift/actions/workflows/ci.yml)
+[![CI](https://github.com/isaim0011/rift/actions/workflows/ci.yml/badge.svg)](https://github.com/isaim0011/rift/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](Cargo.toml)
 [![OpenAPI Coverage](https://img.shields.io/badge/OpenAPI%203.1-250%2F250%20(100%25)-brightgreen.svg)](COVERAGE_REST.md)
 [![Rust Safety](https://img.shields.io/badge/unsafe-forbidden-success.svg)](crates/)

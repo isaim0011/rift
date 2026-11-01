@@ -89,7 +89,7 @@ Measured via `rift-bench` on local loopback (Intel Core i5-6200U @ 2.30GHz, Wind
 - **Tier 2 (Typed Model Parsing)**: 164,217 events/sec (p50: 10.30 µs, p95: 15.00 µs, p99: 36.60 µs) — 1.99x faster than `twilight-gateway + twilight-model` (82,442 ev/s) and 2.14x faster than `serenity` 0.12.5 parse-only
 - **Tier 3 (Full Stack with State Cache + Permissions + Routing)**: 112,381 events/sec (harness peak: 125,812 events/sec, p50: 7.70 µs, p99: 24.90 µs)
 - **Live Node.js v24 Baseline**: 39,911 events/sec (p50: 9.70 µs, p99: 54.50 µs)
-- **Live Python 3.14 Baseline**: 4,061 events/sec (p50: 95.60 µs, p99: 570.10 µs)
+- **Live Python 3.13 Baseline**: 4,061 events/sec (p50: 95.60 µs, p99: 570.10 µs)
 - **Wire Compression**: 19.5x (7.6 MB raw -> 0.4 MB compressed via zstd-stream)
 - **State Cache Overhead**: Bounded FIFO O(50) (~120 KB per active shard)
 
