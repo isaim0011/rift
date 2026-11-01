@@ -10,6 +10,7 @@
 pub mod command;
 mod config;
 mod error;
+mod frame;
 mod shard;
 mod transport;
 mod zstd_stream;

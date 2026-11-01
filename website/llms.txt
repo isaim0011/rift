@@ -6,7 +6,7 @@
 - Pure Sans-I/O: Protocol state machines are decoupled from network transports, allowing deterministic testing and zero-overhead execution.
 - Zero Unsafe: Every crate in the workspace compiles under `#![forbid(unsafe_code)]`.
 - 100% OpenAPI 3.1 Spec Coverage: 250/250 Discord REST routes implemented, typed, and continuously validated against Discord's official schema.
-- True Multi-Language: Write in Rust (`use rift::prelude::*;`), Node.js/Bun (`import { Client } from 'rift-discord'`), or Python (`from rift import Client`).
+- True Multi-Language: Write in Rust (`use rift::prelude::*;`), Node.js/Bun (`import { RiftClient, Intents } from 'rift-discord'`), or Python (`from rift import RiftClient, Intents`).
 
 ## Installation
 - Rust (Cargo): `cargo add rift-discord`

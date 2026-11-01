@@ -24,21 +24,64 @@ use rift_model::voice::VoiceState;
 use rift_model::GatewayEvent;
 use std::collections::{HashMap, HashSet, VecDeque};
 
+/// A high-performance 64-bit integer hasher for Snowflake keys.
+#[derive(Default, Clone, Copy, Debug)]
+pub struct FastHasher(u64);
+
+impl std::hash::Hasher for FastHasher {
+    #[inline]
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    #[inline]
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.0 = self.0.rotate_left(5) ^ (b as u64);
+            self.0 = self.0.wrapping_mul(0x517cc1b727220a95);
+        }
+    }
+
+    #[inline]
+    fn write_u64(&mut self, i: u64) {
+        let mut x = i.wrapping_add(0x9e3779b97f4a7c15);
+        x = (x ^ (x >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+        x = (x ^ (x >> 27)).wrapping_mul(0x94d049bb133111eb);
+        self.0 = x ^ (x >> 31);
+    }
+}
+
+/// BuildHasher constructing [`FastHasher`].
+#[derive(Default, Clone, Copy, Debug)]
+pub struct FastBuildHasher;
+
+impl std::hash::BuildHasher for FastBuildHasher {
+    type Hasher = FastHasher;
+
+    #[inline]
+    fn build_hasher(&self) -> Self::Hasher {
+        FastHasher(0)
+    }
+}
+
+type FastHashMap<K, V> = HashMap<K, V, FastBuildHasher>;
+type FastHashSet<T> = HashSet<T, FastBuildHasher>;
+
 /// In-memory state cache for Discord gateway entities.
 #[derive(Clone, Debug)]
 pub struct Cache {
     config: CacheConfig,
-    guilds: HashMap<Snowflake, Guild>,
-    channels: HashMap<Snowflake, Channel>,
-    obfuscated_channels: HashSet<Snowflake>,
-    roles: HashMap<Snowflake, HashMap<Snowflake, Role>>,
-    members: HashMap<Snowflake, HashMap<Snowflake, GuildMember>>,
-    member_order: HashMap<Snowflake, VecDeque<Snowflake>>,
-    users: HashMap<Snowflake, User>,
+    guilds: FastHashMap<Snowflake, Guild>,
+    channels: FastHashMap<Snowflake, Channel>,
+    obfuscated_channels: FastHashSet<Snowflake>,
+    roles: FastHashMap<Snowflake, FastHashMap<Snowflake, Role>>,
+    members: FastHashMap<Snowflake, FastHashMap<Snowflake, GuildMember>>,
+    member_order: FastHashMap<Snowflake, VecDeque<Snowflake>>,
+    users: FastHashMap<Snowflake, User>,
     user_order: VecDeque<Snowflake>,
-    messages: HashMap<Snowflake, VecDeque<Message>>,
-    voice_states: HashMap<Snowflake, HashMap<Snowflake, VoiceState>>,
-    presences: HashMap<Snowflake, HashMap<Snowflake, PresenceUpdate>>,
+    messages: FastHashMap<Snowflake, VecDeque<Message>>,
+    voice_states: FastHashMap<Snowflake, FastHashMap<Snowflake, VoiceState>>,
+    presences: FastHashMap<Snowflake, FastHashMap<Snowflake, PresenceUpdate>>,
     current_user: Option<User>,
 }
 
@@ -53,17 +96,17 @@ impl Cache {
     pub fn new(config: CacheConfig) -> Self {
         Self {
             config,
-            guilds: HashMap::new(),
-            channels: HashMap::new(),
-            obfuscated_channels: HashSet::new(),
-            roles: HashMap::new(),
-            members: HashMap::new(),
-            member_order: HashMap::new(),
-            users: HashMap::new(),
+            guilds: FastHashMap::default(),
+            channels: FastHashMap::default(),
+            obfuscated_channels: FastHashSet::default(),
+            roles: FastHashMap::default(),
+            members: FastHashMap::default(),
+            member_order: FastHashMap::default(),
+            users: FastHashMap::default(),
             user_order: VecDeque::new(),
-            messages: HashMap::new(),
-            voice_states: HashMap::new(),
-            presences: HashMap::new(),
+            messages: FastHashMap::default(),
+            voice_states: FastHashMap::default(),
+            presences: FastHashMap::default(),
             current_user: None,
         }
     }
@@ -266,15 +309,16 @@ impl Cache {
         let member = self.member(guild_id, user_id)?;
 
         // Base permissions
-        let everyone_perms = self
-            .role(guild_id, guild_id)
+        let guild_roles = self.roles.get(&guild_id);
+        let everyone_perms = guild_roles
+            .and_then(|r| r.get(&guild_id))
             .map(|r| r.permissions)
             .unwrap_or(Permissions::NONE);
 
         let member_role_perms = member
             .roles
             .iter()
-            .filter_map(|&rid| self.role(guild_id, rid).map(|r| r.permissions));
+            .filter_map(|&rid| guild_roles.and_then(|r| r.get(&rid)).map(|r| r.permissions));
 
         let base = compute_base_permissions(is_owner, everyone_perms, member_role_perms);
         if base.contains(Permissions::ADMINISTRATOR) {
@@ -282,39 +326,37 @@ impl Cache {
         }
 
         // Channel overwrites
-        let everyone_ow = channel.permission_overwrites.as_ref().and_then(|ows| {
-            ows.iter()
-                .find(|o| o.kind == 0 && o.id == guild_id)
-                .map(|o| Overwrite {
-                    allow: o.allow,
-                    deny: o.deny,
-                })
-        });
+        let mut perms = match &channel.permission_overwrites {
+            None => base,
+            Some(ows) if ows.is_empty() => base,
+            Some(ows) => {
+                let everyone_ow = ows
+                    .iter()
+                    .find(|o| o.kind == 0 && o.id == guild_id)
+                    .map(|o| Overwrite {
+                        allow: o.allow,
+                        deny: o.deny,
+                    });
 
-        let role_ows = channel
-            .permission_overwrites
-            .as_ref()
-            .map(|ows| {
-                ows.iter()
+                let role_ows_iter = ows
+                    .iter()
                     .filter(|o| o.kind == 0 && member.roles.contains(&o.id))
                     .map(|o| Overwrite {
                         allow: o.allow,
                         deny: o.deny,
-                    })
-                    .collect::<Vec<_>>()
-            })
-            .unwrap_or_default();
+                    });
 
-        let member_ow = channel.permission_overwrites.as_ref().and_then(|ows| {
-            ows.iter()
-                .find(|o| o.kind == 1 && o.id == user_id)
-                .map(|o| Overwrite {
-                    allow: o.allow,
-                    deny: o.deny,
-                })
-        });
+                let member_ow = ows
+                    .iter()
+                    .find(|o| o.kind == 1 && o.id == user_id)
+                    .map(|o| Overwrite {
+                        allow: o.allow,
+                        deny: o.deny,
+                    });
 
-        let mut perms = compute_overwrites(base, everyone_ow, role_ows, member_ow);
+                compute_overwrites(base, everyone_ow, role_ows_iter, member_ow)
+            }
+        };
         perms = apply_implicit_permissions(perms);
 
         if is_timed_out(member.communication_disabled_until.as_deref()) {
@@ -363,7 +405,7 @@ impl Cache {
     fn handle_ready(&mut self, ev: &Ready) {
         if self.config.cache_users {
             self.current_user = Some(ev.user.clone());
-            self.insert_user_with_limit(ev.user.clone());
+            self.insert_user_with_limit(&ev.user);
         }
         if self.config.cache_guilds {
             for ug in &ev.guilds {
@@ -595,7 +637,7 @@ impl Cache {
     fn handle_guild_member_update(&mut self, ev: &GuildMemberUpdate) {
         let user_id = ev.user.id;
         if self.config.cache_users {
-            self.insert_user_with_limit(ev.user.clone());
+            self.insert_user_with_limit(&ev.user);
         }
 
         if self.config.cache_members {
@@ -699,16 +741,25 @@ impl Cache {
     fn handle_message_create(&mut self, msg: &MessageCreate) {
         if self.config.cache_users {
             if let Some(author) = &msg.author {
-                self.insert_user_with_limit(author.clone());
+                self.insert_user_with_limit(author);
             }
         }
 
         if self.config.max_messages_per_channel > 0 {
-            let deque = self.messages.entry(msg.channel_id).or_default();
+            let deque = match self.messages.get_mut(&msg.channel_id) {
+                Some(d) => d,
+                None => self.messages.entry(msg.channel_id).or_default(),
+            };
             if deque.len() >= self.config.max_messages_per_channel {
-                deque.pop_front();
+                if let Some(mut recycled) = deque.pop_front() {
+                    recycled.clone_from(msg);
+                    deque.push_back(recycled);
+                } else {
+                    deque.push_back(msg.clone());
+                }
+            } else {
+                deque.push_back(msg.clone());
             }
-            deque.push_back(msg.clone());
         }
     }
 
@@ -778,7 +829,7 @@ impl Cache {
     fn handle_user_update(&mut self, user: &UserUpdate) {
         if self.config.cache_users {
             self.current_user = Some(user.clone());
-            self.insert_user_with_limit(user.clone());
+            self.insert_user_with_limit(user);
         }
     }
 
@@ -802,7 +853,7 @@ impl Cache {
         if let Some(user) = &member.user {
             let user_id = user.id;
             if self.config.cache_users {
-                self.insert_user_with_limit(user.clone());
+                self.insert_user_with_limit(user);
             }
 
             let members = self.members.entry(guild_id).or_default();
@@ -828,23 +879,28 @@ impl Cache {
     }
 
     /// Inserts a user while enforcing `max_users` FIFO eviction.
-    fn insert_user_with_limit(&mut self, user: User) {
+    fn insert_user_with_limit(&mut self, user: &User) {
         let user_id = user.id;
-        if !self.users.contains_key(&user_id) {
-            if let Some(limit) = self.config.max_users {
-                if limit == 0 {
-                    return;
-                }
-                while self.users.len() >= limit {
-                    if let Some(oldest) = self.user_order.pop_front() {
-                        self.users.remove(&oldest);
-                    } else {
-                        break;
-                    }
+        if let Some(existing) = self.users.get_mut(&user_id) {
+            if existing != user {
+                existing.clone_from(user);
+            }
+            return;
+        }
+
+        if let Some(limit) = self.config.max_users {
+            if limit == 0 {
+                return;
+            }
+            while self.users.len() >= limit {
+                if let Some(oldest) = self.user_order.pop_front() {
+                    self.users.remove(&oldest);
+                } else {
+                    break;
                 }
             }
-            self.user_order.push_back(user_id);
         }
-        self.users.insert(user_id, user);
+        self.user_order.push_back(user_id);
+        self.users.insert(user_id, user.clone());
     }
 }

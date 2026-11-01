@@ -1,0 +1,23 @@
+[package]
+name = "rift-bench-rivals"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+rift-core = { package = "rift-discord-core", path = "../rift-core" }
+rift-gateway = { path = "../rift-gateway" }
+rift-model = { path = "../rift-model" }
+rift-runtime = { path = "../rift-runtime" }
+
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "net"] }
+tokio-tungstenite = "0.30"
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+zstd = "0.13"
+
+# Rivals
+twilight-gateway = { version = "0.17", default-features = false, features = ["zstd", "rustls-platform-verifier"] }
+twilight-model = "0.17"
+serenity = { version = "0.12", default-features = false, features = ["gateway", "client", "model", "rustls_backend"] }

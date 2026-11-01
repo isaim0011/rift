@@ -4,8 +4,8 @@
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](Cargo.toml)
 [![OpenAPI Coverage](https://img.shields.io/badge/OpenAPI%203.1-250%2F250%20(100%25)-brightgreen.svg)](COVERAGE_REST.md)
 [![Rust Safety](https://img.shields.io/badge/unsafe-forbidden-success.svg)](crates/)
-[![npm](https://img.shields.io/npm/v/@rift-rs/node.svg?color=cb3837&logo=npm)](https://www.npmjs.com/package/@rift-rs/node)
-[![PyPI](https://img.shields.io/pypi/v/rift-py.svg?color=3775a9&logo=pypi)](https://pypi.org/project/rift-py/)
+[![npm](https://img.shields.io/npm/v/rift-discord.svg?color=cb3837&logo=npm)](https://www.npmjs.com/package/rift-discord)
+[![PyPI](https://img.shields.io/pypi/v/rift-discord.svg?color=3775a9&logo=pypi)](https://pypi.org/project/rift-discord/)
 
 **Rift** is a high-performance, modular, sans-I/O Discord engine written in pure Rust. Built from the ground up for extreme throughput, predictable sub-microsecond latency, and zero memory waste, Rift implements **250 out of 250 Discord REST operations (100.0% of Discord's OpenAPI 3.1 specification)** alongside a complete sharded gateway runtime, Voice Gateway v8 engine, obfuscation-safe state cache, and zero-overhead native bindings for Node.js, Bun, and Python.
 
@@ -45,7 +45,7 @@ Auxiliary & Tooling Crates:
 • rift-voice:    Sans-I/O Voice Gateway v8 state machine, UDP IP discovery, and RTP framing.
 • rift-coverage: Automated CI test & coverage analyzer verifying parity against openapi.json.
 • rift-bench:    Criterion microbenchmarks, comparative cross-runtime benchmarks, and loopback mock harness.
-• bindings:      Native zero-copy CPython (`rift-py`) and Node.js/Bun (`@rift-rs/node`) bindings.
+• bindings:      Native zero-copy CPython and Node.js/Bun bindings (`rift-discord` on npm and PyPI).
 ```
 
 1. **`rift`**: Umbrella facade exporting `rift::prelude::*`, `Framework`, `CommandRouter`, and unified `ClientBuilder`.
@@ -163,7 +163,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // 2. Configure client with intents and caching
     let client = Client::builder("DISCORD_BOT_TOKEN", Intents::GUILDS | Intents::GUILD_MESSAGES)
-        .cache(CacheConfig::default())
+        .with_cache(CacheConfig::default())
         .build()
         .await?;
 
@@ -203,13 +203,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 Rift exposes its high-performance, sans-I/O Rust core directly to JavaScript/TypeScript (Node.js, Bun) and Python runtimes without writing a single line of Rust.
 
-### Node.js & Bun (`@rift-rs/node`)
+### Node.js & Bun (`rift-discord`)
 
 Install via npm, pnpm, yarn, or bun:
 ```bash
-npm install @rift-rs/node
+npm install rift-discord
 # or
-bun add @rift-rs/node
+bun add rift-discord
 ```
 
 Use Rift's Rust primitives, Ed25519 verifier, cache, and client in TypeScript or JavaScript:
@@ -222,15 +222,15 @@ import {
   RateLimiter,
   Cache,
   RiftClient,
-} from "@rift-rs/node";
+} from "rift-discord";
 
 // 1. High-precision 64-bit Snowflake parsing & math
-const id = new Snowflake("123456789012345678");
-console.log(`Created: ${id.timestamp.toISOString()}, Worker: ${id.workerId}`);
+const id = "123456789012345678";
+console.log(`Created: ${new Date(Snowflake.timestampMs(id)).toISOString()}, Worker: ${Snowflake.workerId(id)}`);
 
 // 2. Zero-allocation Bitfield Permissions
 const perms = Permissions.VIEW_CHANNEL | Permissions.SEND_MESSAGES | Permissions.EMBED_LINKS;
-console.log("Can send messages:", perms.has(Permissions.SEND_MESSAGES));
+console.log("Can send messages:", Permissions.hasPermission(perms, Permissions.SEND_MESSAGES));
 
 // 3. Constant-Time Serverless Ed25519 Interaction Verification
 // Perfect for Express, Fastify, Hono, or Cloudflare Workers:
@@ -244,21 +244,22 @@ const isValid = verifyInteraction(
 // 4. Sans-I/O Rate Limiter & Obfuscation-Safe In-Memory Cache
 const limiter = new RateLimiter();
 const cache = new Cache();
-cache.insertGuild(rawGuildJsonPayload);
+cache.update(rawGuildJsonPayload);
 ```
 
-### Python (`rift-py`)
+### Python (`rift-discord`)
 
 Install via pip or uv:
 ```bash
-pip install rift-py
+pip install rift-discord
 # or
-uv add rift-py
+uv add rift-discord
 ```
 
 Idiomatic Python bindings with type annotations and native C-extension speed:
 
 ```python
+import os
 from rift import (
     Snowflake,
     Permissions,
@@ -269,26 +270,26 @@ from rift import (
 )
 
 # 1. 64-bit Snowflake inspection
-sf = Snowflake("123456789012345678")
-print(f"Timestamp: {sf.timestamp}, Worker ID: {sf.worker_id}, Process ID: {sf.process_id}")
+sf_id = 123456789012345678
+print(f"Timestamp: {Snowflake.timestamp_ms(sf_id)}, Worker ID: {Snowflake.worker_id(sf_id)}, Process ID: {Snowflake.process_id(sf_id)}")
 
 # 2. Permissions bitfield operations
 perms = Permissions.VIEW_CHANNEL | Permissions.SEND_MESSAGES | Permissions.MANAGE_ROLES
-assert perms.has(Permissions.SEND_MESSAGES)
-print(f"Effective permissions bitfield: {perms.value:#x}")
+assert Permissions.has_permission(perms, Permissions.SEND_MESSAGES)
+print(f"Effective permissions bitfield: {perms:#x}")
 
 # 3. Serverless Ed25519 Webhook Verification (FastAPI, Quart, Flask)
 is_valid = verify_interaction(
     public_key_hex=os.environ["DISCORD_PUBLIC_KEY"],
-    signature_header=request.headers["x-signature-ed25519"],
-    timestamp_header=request.headers["x-signature-timestamp"],
-    body_bytes=raw_body_bytes,
+    signature_hex=request.headers["x-signature-ed25519"],
+    timestamp=request.headers["x-signature-timestamp"],
+    body=raw_body_bytes,
 )
 
 # 4. Sans-I/O Rate Limiter and Obfuscation-safe Cache
 limiter = RateLimiter()
 cache = Cache()
-cache.insert_guild(guild_data_dict)
+cache.update(guild_data_dict)
 ```
 
 ---

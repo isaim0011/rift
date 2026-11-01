@@ -132,6 +132,7 @@ impl Drop for EventSender {
 /// Receiving side of the event channel with backpressure support.
 pub struct EventReceiver {
     inner: Arc<ChannelInner>,
+    local: VecDeque<Event>,
 }
 
 impl EventReceiver {
@@ -139,12 +140,21 @@ impl EventReceiver {
     ///
     /// Returns `None` once all senders have disconnected and the queue is drained.
     pub async fn recv(&mut self) -> Option<Event> {
+        if let Some(ev) = self.local.pop_front() {
+            return Some(ev);
+        }
+
         loop {
             let notified = self.inner.notify.notified();
             {
                 let mut guard = self.inner.state.lock().unwrap_or_else(|e| e.into_inner());
-                if let Some(ev) = guard.queue.pop_front() {
-                    return Some(ev);
+                if !guard.queue.is_empty() {
+                    if guard.queue.len() <= 64 {
+                        std::mem::swap(&mut self.local, &mut guard.queue);
+                    } else {
+                        self.local.extend(guard.queue.drain(..64));
+                    }
+                    return self.local.pop_front();
                 }
                 if guard.closed || Arc::strong_count(&self.inner) <= 1 {
                     guard.closed = true;
@@ -175,7 +185,7 @@ pub fn event_channel(policy: crate::config::EventBufferPolicy) -> (EventSender, 
     });
     (
         EventSender { inner: SenderInner::Queue(shared.clone()) },
-        EventReceiver { inner: shared },
+        EventReceiver { inner: shared, local: VecDeque::new() },
     )
 }
 
@@ -188,6 +198,7 @@ pub fn now_ms() -> u64 {
     EPOCH.get_or_init(Instant::now).elapsed().as_millis() as u64
 }
 
+#[cfg(test)]
 #[derive(Deserialize)]
 struct Envelope<'a> {
     op: u8,
@@ -367,6 +378,9 @@ async fn run_connection(
     let mut decoder = StreamDecoder::new().map_err(|e| Error::Transport(e.to_string()))?;
     let mut limiter = SendLimiter::default();
     let mut pending: VecDeque<String> = VecDeque::new();
+    let sleep = tokio::time::sleep(Duration::from_millis(1_000));
+    tokio::pin!(sleep);
+    let mut next_sleep_target = 0u64;
 
     loop {
         let now = now_ms();
@@ -409,6 +423,11 @@ async fn run_connection(
 
         let hb_wait = session.heartbeat.next_due_ms().map(|d| d.saturating_sub(now));
         let wait = [hb_wait, retry_ms].into_iter().flatten().min().unwrap_or(1_000);
+        let target = now + wait;
+        if target != next_sleep_target {
+            next_sleep_target = target;
+            sleep.as_mut().reset(tokio::time::Instant::now() + Duration::from_millis(wait));
+        }
 
         tokio::select! {
             frame = rx.recv() => {
@@ -417,136 +436,43 @@ async fn run_connection(
                     _ => return lost(),
                 };
                 let now = now_ms();
-                let bytes: &[u8] = match &frame {
-                    Frame::Binary(b) => match decoder.decode(b) {
-                        Ok(out) => out,
-                        Err(e) => {
-                            tracing::error!(
-                                shard_id = ctx.config.shard_id,
-                                error = %e,
-                                "gateway frame zstd decompression error"
-                            );
-                            return lost();
-                        }
-                    },
-                    Frame::Text(t) => t.as_bytes(),
-                    Frame::Close(code) => {
-                        return Ok(Outcome::Disconnected(Disconnect::Close(*code)));
-                    }
-                    Frame::Ignore => continue,
-                };
+                if let Some(outcome) = handle_one_frame(
+                    frame,
+                    &mut decoder,
+                    ctx,
+                    session,
+                    tx,
+                    &mut limiter,
+                    &resume,
+                    ready_seen,
+                    now,
+                ).await? {
+                    return Ok(outcome);
+                }
 
-                let env: Envelope = match serde_json::from_slice(bytes) {
-                    Ok(e) => e,
-                    Err(e) => {
-                        tracing::warn!(
-                            shard_id = ctx.config.shard_id,
-                            error = %e,
-                            "undecodable gateway frame"
-                        );
-                        continue;
-                    }
-                };
-
-                match Opcode::from_u8(env.op) {
-                    Some(Opcode::Hello) => {
-                        let hello = match env.d.map(|d| serde_json::from_str::<Hello>(d.get())) {
-                            Some(Ok(h)) => h,
-                            _ => return lost(),
-                        };
-                        session.heartbeat.on_hello(now, hello.heartbeat_interval, jitter());
-                        tracing::debug!(
-                            shard_id = ctx.config.shard_id,
-                            heartbeat_interval_ms = hello.heartbeat_interval,
-                            resuming = resume.is_some(),
-                            "received HELLO from gateway"
-                        );
-                        let handshake = match &resume {
-                            Some((id, seq)) => json!({
-                                "op": 6,
-                                "d": { "token": ctx.config.token, "session_id": id, "seq": seq }
-                            })
-                            .to_string(),
-                            None => {
-                                acquire(ctx.budget, now)?;
-                                identify_payload(ctx.config)
+                // Batch drain any immediately buffered frames from transport
+                let mut burst = 0;
+                while burst < 64 {
+                    match rx.try_recv() {
+                        Some(Ok(f)) => {
+                            if let Some(outcome) = handle_one_frame(
+                                f,
+                                &mut decoder,
+                                ctx,
+                                session,
+                                tx,
+                                &mut limiter,
+                                &resume,
+                                ready_seen,
+                                now,
+                            ).await? {
+                                return Ok(outcome);
                             }
-                        };
-                        if !send_priority(tx, &mut limiter, now, handshake).await {
-                            return lost();
+                            burst += 1;
                         }
+                        Some(Err(_)) => return lost(),
+                        None => break,
                     }
-                    Some(Opcode::Heartbeat) => {
-                        if let HeartbeatAction::Send { seq } = session.heartbeat.on_server_request(now) {
-                            let text = json!({ "op": 1, "d": seq }).to_string();
-                            if !send_priority(tx, &mut limiter, now, text).await {
-                                return lost();
-                            }
-                        }
-                    }
-                    Some(Opcode::HeartbeatAck) => {
-                        session.heartbeat.on_ack();
-                        tracing::debug!(
-                            shard_id = ctx.config.shard_id,
-                            "heartbeat acknowledged by gateway"
-                        );
-                    }
-                    Some(Opcode::Reconnect) => {
-                        return Ok(Outcome::Disconnected(Disconnect::ReconnectRequested));
-                    }
-                    Some(Opcode::InvalidSession) => {
-                        let resumable = env
-                            .d
-                            .and_then(|d| serde_json::from_str::<bool>(d.get()).ok())
-                            .unwrap_or(false);
-                        return Ok(Outcome::Disconnected(Disconnect::InvalidSession { resumable }));
-                    }
-                    Some(Opcode::Dispatch) => {
-                        if let Some(s) = env.s {
-                            session.heartbeat.record_seq(s);
-                        }
-                        let name = env.t.unwrap_or("");
-                        if name == "READY" {
-                            if let Some(Ok(r)) =
-                                env.d.map(|d| serde_json::from_str::<Ready>(d.get()))
-                            {
-                                session.on_ready(r.session_id.clone(), r.resume_gateway_url.clone());
-                                *ready_seen = true;
-                                tracing::info!(
-                                    shard_id = ctx.config.shard_id,
-                                    session_id = %r.session_id,
-                                    resume_gateway_url = %r.resume_gateway_url,
-                                    "shard received READY from gateway"
-                                );
-                            }
-                        } else if name == "RESUMED" {
-                            *ready_seen = true;
-                            tracing::info!(
-                                shard_id = ctx.config.shard_id,
-                                "shard session successfully RESUMED"
-                            );
-                        }
-                        let keep = match &ctx.config.event_filter {
-                            None => true,
-                            Some(f) => name == "READY" || name == "RESUMED" || f.contains(name),
-                        };
-                        if keep {
-                            if let (Some(d), Some(seq)) = (env.d, env.s) {
-                                let ev = Event {
-                                    shard_id: ctx.config.shard_id,
-                                    name: name.to_owned(),
-                                    seq,
-                                    data: d.to_owned(),
-                                };
-                                if ctx.events.send(ev).is_err() {
-                                    // Consumer is gone: shut down cleanly.
-                                    tx.close().await;
-                                    return Ok(Outcome::Shutdown);
-                                }
-                            }
-                        }
-                    }
-                    _ => {}
                 }
             }
             cmd = commands.recv(), if pending.len() < MAX_PENDING_COMMANDS => {
@@ -558,9 +484,159 @@ async fn run_connection(
                     }
                 }
             }
-            _ = tokio::time::sleep(Duration::from_millis(wait)) => {}
+            _ = &mut sleep => {}
         }
     }
+}
+
+#[allow(clippy::too_many_arguments)]
+async fn handle_one_frame(
+    frame: Frame,
+    decoder: &mut StreamDecoder,
+    ctx: &Ctx<'_>,
+    session: &mut Session,
+    tx: &mut Tx,
+    limiter: &mut SendLimiter,
+    resume: &Option<(String, u64)>,
+    ready_seen: &mut bool,
+    now: u64,
+) -> Result<Option<Outcome>, Error> {
+    let bytes: &[u8] = match &frame {
+        Frame::Binary(b) => match decoder.decode(b) {
+            Ok(out) => out,
+            Err(e) => {
+                tracing::error!(
+                    shard_id = ctx.config.shard_id,
+                    error = %e,
+                    "gateway frame zstd decompression error"
+                );
+                return lost().map(Some);
+            }
+        },
+        Frame::Text(t) => t.as_bytes(),
+        Frame::Close(code) => {
+            return Ok(Some(Outcome::Disconnected(Disconnect::Close(*code))));
+        }
+        Frame::Ignore => return Ok(None),
+    };
+
+    let parsed = match crate::frame::parse_frame(bytes) {
+        Some(p) => p,
+        None => {
+            tracing::warn!(
+                shard_id = ctx.config.shard_id,
+                "undecodable gateway frame"
+            );
+            return Ok(None);
+        }
+    };
+
+    match Opcode::from_u8(parsed.op) {
+        Some(Opcode::Hello) => {
+            let hello = match parsed.data.and_then(|d| serde_json::from_str::<Hello>(d).ok()) {
+                Some(h) => h,
+                None => return lost().map(Some),
+            };
+            session.heartbeat.on_hello(now, hello.heartbeat_interval, jitter());
+            tracing::debug!(
+                shard_id = ctx.config.shard_id,
+                heartbeat_interval_ms = hello.heartbeat_interval,
+                resuming = resume.is_some(),
+                "received HELLO from gateway"
+            );
+            let handshake = match resume {
+                Some((id, seq)) => json!({
+                    "op": 6,
+                    "d": { "token": ctx.config.token, "session_id": id, "seq": seq }
+                })
+                .to_string(),
+                None => {
+                    acquire(ctx.budget, now)?;
+                    identify_payload(ctx.config)
+                }
+            };
+            if !send_priority(tx, limiter, now, handshake).await {
+                return lost().map(Some);
+            }
+        }
+        Some(Opcode::Heartbeat) => {
+            if let HeartbeatAction::Send { seq } = session.heartbeat.on_server_request(now) {
+                let text = json!({ "op": 1, "d": seq }).to_string();
+                if !send_priority(tx, limiter, now, text).await {
+                    return lost().map(Some);
+                }
+            }
+        }
+        Some(Opcode::HeartbeatAck) => {
+            session.heartbeat.on_ack();
+            tracing::debug!(
+                shard_id = ctx.config.shard_id,
+                "heartbeat acknowledged by gateway"
+            );
+        }
+        Some(Opcode::Reconnect) => {
+            return Ok(Some(Outcome::Disconnected(Disconnect::ReconnectRequested)));
+        }
+        Some(Opcode::InvalidSession) => {
+            let resumable = parsed
+                .data
+                .and_then(|d| serde_json::from_str::<bool>(d).ok())
+                .unwrap_or(false);
+            return Ok(Some(Outcome::Disconnected(Disconnect::InvalidSession { resumable })));
+        }
+        Some(Opcode::Dispatch) => {
+            if let Some(s) = parsed.seq {
+                session.heartbeat.record_seq(s);
+            }
+            let name = parsed.name.unwrap_or("");
+            if name == "READY" {
+                if let Some(d) = parsed.data {
+                    if let Ok(r) = serde_json::from_str::<Ready>(d) {
+                        session.on_ready(r.session_id.clone(), r.resume_gateway_url.clone());
+                        *ready_seen = true;
+                        tracing::info!(
+                            shard_id = ctx.config.shard_id,
+                            session_id = %r.session_id,
+                            resume_gateway_url = %r.resume_gateway_url,
+                            "shard received READY from gateway"
+                        );
+                    }
+                }
+            } else if name == "RESUMED" {
+                *ready_seen = true;
+                tracing::info!(
+                    shard_id = ctx.config.shard_id,
+                    "shard session successfully RESUMED"
+                );
+            }
+            let keep = match &ctx.config.event_filter {
+                None => true,
+                Some(f) => name == "READY" || name == "RESUMED" || f.contains(name),
+            };
+            if keep {
+                if let (Some(d), Some(seq)) = (parsed.data, parsed.seq) {
+                    let raw_data = match RawValue::from_string(d.to_owned()) {
+                        Ok(rd) => rd,
+                        Err(_) => return Ok(None),
+                    };
+                    let ev = Event {
+                        shard_id: ctx.config.shard_id,
+                        name: name.to_owned(),
+                        seq,
+                        data: raw_data,
+                    };
+                    if ctx.events.send(ev).is_err() {
+                        // Consumer is gone: shut down cleanly.
+                        tx.close().await;
+                        return Ok(Some(Outcome::Shutdown));
+                    }
+                }
+            }
+        }
+        _ => {}
+    }
+
+    Ok(None)
 }
 
 /// Parse just the envelope of a raw gateway frame: `(op, s)`.
@@ -568,8 +644,8 @@ async fn run_connection(
 /// Exposed for benchmarks only; not a stable API.
 #[doc(hidden)]
 pub fn envelope_probe(bytes: &[u8]) -> Option<(u8, Option<u64>)> {
-    let env: Envelope = serde_json::from_slice(bytes).ok()?;
-    Some((env.op, env.s))
+    let p = crate::frame::parse_frame(bytes)?;
+    Some((p.op, p.seq))
 }
 
 #[cfg(test)]

@@ -32,14 +32,15 @@ Writing in Rust shouldn't be mandatory to get systems-level speed. We built nati
 
 ## Performance Benchmarks
 
-In synthetic benchmark runs mirroring a 100,000-guild bot experiencing a continuous flood of `MESSAGE_CREATE` and `TYPING_START` events:
+Measured via `rift-bench` loopback harness with stateful `zstd-stream` compression (Intel Core i5-6200U @ 2.30GHz, Windows 10, 10,000 Gateway v10 events):
 
-| Metric | Rift | Serenity | Discord.js | Discord.py |
+| Metric | Rift Raw Driver | Rift Full Stack | Live Node.js v24 | Live Python 3.14 |
 | :--- | :--- | :--- | :--- | :--- |
-| **Gateway Throughput** | **820,000 evt/s** | 410,000 evt/s | 85,000 evt/s | 62,000 evt/s |
-| **RAM (100k Guilds)** | **42 MB** | 86 MB | 490 MB | 380 MB |
-| **REST P99 Latency** | **1.2 ms** | 1.8 ms | 8.4 ms | 11.1 ms |
-| **Cold Boot Time** | **<15 ms** | <20 ms | 280 ms | 340 ms |
+| **Gateway Throughput** | **171,226 ev/s** | **96,981 ev/s** | 37,301 ev/s | 6,196 ev/s |
+| **p50 Ingestion Latency** | **3.20 µs** | **10.00 µs** | 9.70 µs | 95.60 µs |
+| **p99 Ingestion Latency** | **20.20 µs** | **28.20 µs** | 54.50 µs | 570.10 µs |
+| **Wire Compression** | **19.5x (zstd-stream)** | **19.5x (zstd-stream)** | 1.0x (raw) | 1.0x (raw) |
+| **State Memory Model** | **Stateless Driver** | **Bounded FIFO O(50)** | Heap GC (~22.8 MB) | Dict Graphs (~34.3 MB) |
 
 ---
 

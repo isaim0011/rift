@@ -13,7 +13,7 @@ type Ws = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
 /// Transport-independent view of a websocket frame.
 pub enum Frame {
-    Binary(Vec<u8>),
+    Binary(tokio_tungstenite::tungstenite::Bytes),
     Text(String),
     Close(Option<u16>),
     Ignore,
@@ -46,11 +46,28 @@ impl Rx {
         match self.0.next().await? {
             Err(e) => Some(Err(e.to_string())),
             Ok(msg) => Some(Ok(match msg {
-                Message::Binary(b) => Frame::Binary(b.to_vec()),
+                Message::Binary(b) => Frame::Binary(b),
                 Message::Text(t) => Frame::Text(t.as_str().to_owned()),
                 Message::Close(f) => Frame::Close(f.map(|f| u16::from(f.code))),
                 _ => Frame::Ignore,
             })),
+        }
+    }
+
+    /// Try to receive the next frame synchronously if already buffered in the transport.
+    pub fn try_recv(&mut self) -> Option<Result<Frame, String>> {
+        use futures_util::task::noop_waker_ref;
+        use std::task::{Context, Poll};
+        let mut cx = Context::from_waker(noop_waker_ref());
+        match self.0.poll_next_unpin(&mut cx) {
+            Poll::Ready(Some(Err(e))) => Some(Err(e.to_string())),
+            Poll::Ready(Some(Ok(msg))) => Some(Ok(match msg {
+                Message::Binary(b) => Frame::Binary(b),
+                Message::Text(t) => Frame::Text(t.as_str().to_owned()),
+                Message::Close(f) => Frame::Close(f.map(|f| u16::from(f.code))),
+                _ => Frame::Ignore,
+            })),
+            _ => None,
         }
     }
 }

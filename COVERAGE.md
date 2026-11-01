@@ -29,7 +29,7 @@ Legend: ✅ done · ◐ partial · ❌ not yet · ⛔ out of scope for a server-
 | OAuth2 (topic) | ✅ | Application info, bot authorization URLs, token endpoints. |
 | Voice connections (topic) | ✅ | REST voice state and regions done; voice gateway UDP transport and AEAD cipher done (`rift-voice`). |
 
-## REST resources (230 of 250 operations implemented · 92.0% spec · 100% of all bot-facing resources)
+## REST resources (250 of 250 operations implemented · 100.0% spec)
 
 | Resource | Status | Notes |
 |---|---|---|
@@ -45,13 +45,12 @@ Legend: ✅ done · ◐ partial · ❌ not yet · ⛔ out of scope for a server-
 | SKU, Entitlement, Subscription (monetization) | ✅ | Monetization SKUs, entitlements, subscriptions. |
 | Application Role Connection Metadata | ✅ | App role connection metadata records. |
 | Voice (REST: regions, voice state) | ✅ | Voice regions and voice state updates. |
-| Lobby, Partner SDK | ⛔ | Client-side game lobbies (15 ops) and Partner SDK (5 ops); out of scope for server-side bots. |
+| Lobby, Partner SDK | ✅ | Discord Lobbies (15 ops) and Partner SDK (5 ops) fully implemented with typed models and validation (`rift-rest::lobby`). |
 
 ## Out of scope
 
 Client-side SDKs and non-API content: **Social SDK** (C++/Unity/Unreal), **Embedded App SDK / Activities**
 (browser JS), **RPC** (local IPC), **Certified Devices**, design guidelines, policies, growth/marketing guides.
-Client-side game lobbies (15 endpoints) and Partner SDK (5 endpoints) are designated as non-bot client APIs.
 
 ## How we get to "everything", and stay there
 

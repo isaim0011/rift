@@ -87,15 +87,39 @@ const PERMISSIONS = {
   READ_MESSAGE_HISTORY: 1n << 16n,
   MENTION_EVERYONE: 1n << 17n,
   USE_EXTERNAL_EMOJIS: 1n << 18n,
+  VIEW_GUILD_INSIGHTS: 1n << 19n,
   CONNECT: 1n << 20n,
   SPEAK: 1n << 21n,
   MUTE_MEMBERS: 1n << 22n,
   DEAFEN_MEMBERS: 1n << 23n,
   MOVE_MEMBERS: 1n << 24n,
+  USE_VAD: 1n << 25n,
+  CHANGE_NICKNAME: 1n << 26n,
+  MANAGE_NICKNAMES: 1n << 27n,
   MANAGE_ROLES: 1n << 28n,
   MANAGE_WEBHOOKS: 1n << 29n,
   MANAGE_GUILD_EXPRESSIONS: 1n << 30n,
-  USE_APPLICATION_COMMANDS: 1n << 31n
+  USE_APPLICATION_COMMANDS: 1n << 31n,
+  REQUEST_TO_SPEAK: 1n << 32n,
+  MANAGE_EVENTS: 1n << 33n,
+  MANAGE_THREADS: 1n << 34n,
+  CREATE_PUBLIC_THREADS: 1n << 35n,
+  CREATE_PRIVATE_THREADS: 1n << 36n,
+  USE_EXTERNAL_STICKERS: 1n << 37n,
+  SEND_MESSAGES_IN_THREADS: 1n << 38n,
+  USE_EMBEDDED_ACTIVITIES: 1n << 39n,
+  MODERATE_MEMBERS: 1n << 40n,
+  VIEW_CREATOR_MONETIZATION_ANALYTICS: 1n << 41n,
+  USE_SOUNDBOARD: 1n << 42n,
+  CREATE_GUILD_EXPRESSIONS: 1n << 43n,
+  CREATE_EVENTS: 1n << 44n,
+  USE_EXTERNAL_SOUNDS: 1n << 45n,
+  SEND_VOICE_MESSAGES: 1n << 46n,
+  SET_VOICE_CHANNEL_STATUS: 1n << 48n,
+  SEND_POLLS: 1n << 49n,
+  USE_EXTERNAL_APPS: 1n << 50n,
+  PIN_MESSAGES: 1n << 51n,
+  BYPASS_SLOWMODE: 1n << 52n,
 };
 
 function handleToolCall(name, args) {
@@ -119,6 +143,11 @@ function handleToolCall(name, args) {
 
   if (name === "calculate_permissions") {
     let bitmask = 0n;
+    if (args.bitmask) {
+      try {
+        bitmask = BigInt(args.bitmask);
+      } catch (_) {}
+    }
     const requested = args.permissions || [];
     for (const p of requested) {
       const upper = p.toUpperCase();
@@ -137,8 +166,9 @@ function handleToolCall(name, args) {
       hex: "0x" + bitmask.toString(16),
       decodedPermissions: decoded,
       codeSnippets: {
-        rust: `GatewayIntents::from_bits_truncate(${bitmask}n)`,
-        typescript: `const permissions = ${bitmask}n;`
+        rust: `Permissions::from_bits_truncate(0x${bitmask.toString(16)})`,
+        typescript: `const permissions = ${bitmask}n; // Permissions.hasPermission(permissions, Permissions.SEND_MESSAGES)`,
+        python: `permissions = ${bitmask} # Permissions.has_permission(permissions, Permissions.SEND_MESSAGES)`
       }
     };
   }
@@ -148,10 +178,22 @@ function handleToolCall(name, args) {
     const standard = [];
     for (const ev of args.events) {
       const upper = ev.toUpperCase();
-      if (upper.includes("MESSAGE_CONTENT") || (upper.includes("MESSAGE") && !upper.includes("INTERACTION"))) {
-        privileged.push("MESSAGE_CONTENT (Requires Discord Developer Portal toggle for message text)");
-      } else if (upper.includes("MEMBER") || upper.includes("PRESENCE")) {
-        privileged.push(`${upper} (Privileged Intent)`);
+      if (upper === "MESSAGE_CONTENT" || upper.includes("CONTENT")) {
+        privileged.push("MESSAGE_CONTENT (Privileged: required for message text, embeds, and attachments)");
+      } else if (
+        upper === "GUILD_MEMBER_ADD" ||
+        upper === "GUILD_MEMBER_UPDATE" ||
+        upper === "GUILD_MEMBER_REMOVE" ||
+        upper === "GUILD_MEMBERS_CHUNK" ||
+        upper === "THREAD_MEMBERS_UPDATE"
+      ) {
+        privileged.push(`${upper} -> GUILD_MEMBERS (Privileged: requires Developer Portal toggle)`);
+      } else if (upper === "PRESENCE_UPDATE") {
+        privileged.push("PRESENCE_UPDATE -> GUILD_PRESENCES (Privileged: requires Developer Portal toggle)");
+      } else if (upper.includes("MESSAGE")) {
+        standard.push(`${upper} -> GUILD_MESSAGES / DIRECT_MESSAGES (Standard intent; add MESSAGE_CONTENT if inspecting body text)`);
+      } else if (upper.includes("INTERACTION")) {
+        standard.push(`${upper} (No gateway intent required; interactions are always delivered)`);
       } else {
         standard.push(upper);
       }
@@ -171,17 +213,17 @@ function handleToolCall(name, args) {
     if (lang === "rust") {
       return {
         language: "rust",
-        code: `use rift::prelude::*;\n\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let client = Client::builder(std::env::var("DISCORD_TOKEN")?)\n        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES)\n        .build()?;\n\n    let mut events = client.events();\n    tokio::spawn(async move { client.start().await.unwrap(); });\n\n    while let Some(event) = events.recv().await {\n        if let Event::MessageCreate(msg) = event {\n            if msg.content == "!ping" {\n                println!("Pong: {}", msg.author.username);\n            }\n        }\n    }\n    Ok(())\n}`
+        code: `use rift::prelude::*;\n\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let client = Client::builder(\n        std::env::var("DISCORD_TOKEN")?,\n        Intents::GUILDS | Intents::GUILD_MESSAGES,\n    )\n    .build()\n    .await?;\n\n    let router = CommandRouter::new()\n        .slash("ping", "Check bot latency", |ctx| async move {\n            ctx.reply("Pong from Rift! ⚡").await?;\n            Ok(())\n        });\n\n    let mut framework = Framework::new(client, router);\n    framework.run().await?;\n    Ok(())\n}`
       };
     } else if (lang === "typescript" || lang === "bun") {
       return {
         language: lang,
-        code: `import { Client, GatewayIntents } from 'rift-discord';\n\nconst client = new Client({\n  token: process.env.DISCORD_TOKEN!,\n  intents: GatewayIntents.Guilds | GatewayIntents.GuildMessages,\n});\n\nclient.on('ready', (user) => console.log(\`Logged in as \${user.username}⚡\`));\nclient.on('messageCreate', async (msg) => {\n  if (msg.content === '!ping') await msg.reply('Pong! ⚡');\n});\n\nawait client.login();`
+        code: `import { RiftClient, Intents } from 'rift-discord';\n\nconst client = new RiftClient(\n  process.env.DISCORD_TOKEN!,\n  Intents.GUILDS | Intents.GUILD_MESSAGES\n);\n\nconsole.log('Rift bot connected. Listening for events...');\nwhile (true) {\n  const event = await client.nextEvent();\n  if (!event) break;\n  if (event.name === 'MESSAGE_CREATE') {\n    if (event.data?.content === '!ping') {\n      console.log(\`Pong from \${event.data.author?.username ?? 'user'}! ⚡\`);\n    }\n  }\n}`
       };
     } else {
       return {
         language: "python",
-        code: `import os\nimport asyncio\nfrom rift import Client, Intents\n\nclient = Client(token=os.environ["DISCORD_TOKEN"], intents=Intents.GUILDS | Intents.GUILD_MESSAGES)\n\n@client.on("ready")\ndef on_ready(user):\n    print(f"Logged in as {user.username}⚡")\n\n@client.on("message_create")\nasync def on_message(msg):\n    if msg.content == "!ping":\n        await msg.reply("Pong! ⚡")\n\nasyncio.run(client.start())`
+        code: `import os\nimport asyncio\nfrom rift import RiftClient, Intents\n\nasync def main():\n    client = RiftClient(\n        os.environ["DISCORD_TOKEN"],\n        intents=Intents.GUILDS | Intents.GUILD_MESSAGES,\n    )\n    print("Rift bot connected. Listening for events...")\n    while True:\n        event = await client.next_event()\n        if event is None:\n            break\n        if event.name == "MESSAGE_CREATE":\n            if event.data.get("content") == "!ping":\n                author = event.data.get("author", {}).get("username", "user")\n                print(f"Pong from {author}! ⚡")\n\nif __name__ == "__main__":\n    asyncio.run(main())`
       };
     }
   }

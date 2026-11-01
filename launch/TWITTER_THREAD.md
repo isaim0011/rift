@@ -3,21 +3,21 @@
 **Tweet 1 (Hook)**
 🚀 Introducing Rift (v0.1.0): The high-performance Discord engine.
 
-⚡ 820,000 events/sec throughput
+⚡ 235k raw events/sec (82.8k full-stack)
 🛡️ 100% zero-unsafe Rust
 🌐 Pure sans-I/O architecture
 📦 Native bindings for Node.js, Bun, & Python
 
-It’s 10x faster than Discord.js with 1/10th the memory.
+Measured on loopback with zstd-stream: 1.9x faster than live Node.js and 14x faster than Python.
 
 🧵 Read the breakdown 👇
 
 ---
 
 **Tweet 2 (The Problem)**
-Running Discord bots at scale is notoriously memory heavy. In Discord.js and Discord.py, caching 100k guilds easily burns 400MB - 1GB+ of RAM, and high-frequency message spikes stall the event loop.
+Running Discord bots at scale is notoriously memory heavy. In Discord.js and Discord.py, high-frequency message spikes stall the event loop and inflate heap memory.
 
-Rift caches the same 100k guilds in just 42 MB.
+Rift uses bounded FIFO state caching and zero-copy streaming decompression to keep latency down to microseconds.
 
 ---
 
@@ -47,18 +47,20 @@ Same ergonomic API across all three runtimes!
 Here’s how clean TypeScript looks with Rift:
 
 ```typescript
-import { Client, GatewayIntents } from 'rift-discord';
+import { RiftClient, Intents } from 'rift-discord';
 
-const client = new Client({
-  token: process.env.DISCORD_TOKEN!,
-  intents: GatewayIntents.Guilds | GatewayIntents.GuildMessages
-});
+const client = new RiftClient(
+  process.env.DISCORD_TOKEN!,
+  Intents.GUILDS | Intents.GUILD_MESSAGES
+);
 
-client.on('messageCreate', async (msg) => {
-  if (msg.content === '!ping') await msg.reply('Pong! ⚡');
-});
-
-await client.login();
+while (true) {
+  const event = await client.nextEvent();
+  if (!event) break;
+  if (event.name === 'MESSAGE_CREATE' && event.data?.content === '!ping') {
+    console.log(`Pong from ${event.data.author?.username}! ⚡`);
+  }
+}
 ```
 
 ---

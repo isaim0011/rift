@@ -106,10 +106,27 @@ struct SnowflakeHelper(
     #[serde(deserialize_with = "de_snowflake", serialize_with = "ser_snowflake")] Snowflake,
 );
 
+struct VecSnowflakeVisitor;
+
+impl<'de> Visitor<'de> for VecSnowflakeVisitor {
+    type Value = Vec<Snowflake>;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("a sequence of snowflakes")
+    }
+
+    fn visit_seq<A: de::SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
+        let mut out = Vec::with_capacity(seq.size_hint().unwrap_or(0));
+        while let Some(sf) = seq.next_element::<SnowflakeHelper>()? {
+            out.push(sf.0);
+        }
+        Ok(out)
+    }
+}
+
 /// Deserialize a vector of [`Snowflake`]s.
 pub fn de_vec_snowflake<'de, D: Deserializer<'de>>(d: D) -> Result<Vec<Snowflake>, D::Error> {
-    let helpers = Vec::<SnowflakeHelper>::deserialize(d)?;
-    Ok(helpers.into_iter().map(|h| h.0).collect())
+    d.deserialize_seq(VecSnowflakeVisitor)
 }
 
 /// Serialize a vector of [`Snowflake`]s as strings.
@@ -124,12 +141,33 @@ pub fn ser_vec_snowflake<S: Serializer>(
     seq.end()
 }
 
+struct OptVecSnowflakeVisitor;
+
+impl<'de> Visitor<'de> for OptVecSnowflakeVisitor {
+    type Value = Option<Vec<Snowflake>>;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("an optional sequence of snowflakes")
+    }
+
+    fn visit_none<E: de::Error>(self) -> Result<Self::Value, E> {
+        Ok(None)
+    }
+
+    fn visit_unit<E: de::Error>(self) -> Result<Self::Value, E> {
+        Ok(None)
+    }
+
+    fn visit_some<D: Deserializer<'de>>(self, deserializer: D) -> Result<Self::Value, D::Error> {
+        deserializer.deserialize_seq(VecSnowflakeVisitor).map(Some)
+    }
+}
+
 /// Deserialize an optional vector of [`Snowflake`]s.
 pub fn de_opt_vec_snowflake<'de, D: Deserializer<'de>>(
     d: D,
 ) -> Result<Option<Vec<Snowflake>>, D::Error> {
-    let opt = Option::<Vec<SnowflakeHelper>>::deserialize(d)?;
-    Ok(opt.map(|helpers| helpers.into_iter().map(|h| h.0).collect()))
+    d.deserialize_option(OptVecSnowflakeVisitor)
 }
 
 /// Serialize an optional vector of [`Snowflake`]s.

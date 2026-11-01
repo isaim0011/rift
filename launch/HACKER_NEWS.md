@@ -13,26 +13,36 @@ I built Rift (https://rift-discord.dev/), a high-performance Discord v10 engine 
 
 2. **Strict Zero-Unsafe Guarantee**: Every single crate in the workspace compiles under `#![forbid(unsafe_code)]`. Memory safety is enforced by the compiler without compromise.
 
-3. **True Multi-Language Polyglot Bindings**: We wanted Python, Node.js, and Bun developers to get 820,000 events/second throughput and 42MB memory footprints without ever having to write or compile Rust. We exposed clean, idiomatic bindings using napi-rs and PyO3 so you can write:
+3. **True Multi-Language Polyglot Bindings**: We wanted Python, Node.js, and Bun developers to benefit from Rust's performance (measured at 96,981 events/sec full stack and 171,226 events/sec raw on loopback) without having to write Rust. We exposed clean, idiomatic bindings using napi-rs and PyO3 so you can write in TypeScript:
 
 ```typescript
-import { Client, GatewayIntents } from 'rift-discord';
-const client = new Client({ token: process.env.DISCORD_TOKEN! });
-client.on('messageCreate', async (msg) => { if (msg.content === '!ping') await msg.reply('Pong!'); });
-await client.login();
+import { RiftClient, Intents } from 'rift-discord';
+const client = new RiftClient(process.env.DISCORD_TOKEN!, Intents.GUILDS | Intents.GUILD_MESSAGES);
+while (true) {
+  const event = await client.nextEvent();
+  if (!event) break;
+  if (event.name === 'MESSAGE_CREATE' && event.data?.content === '!ping') {
+    console.log(`Pong from ${event.data.author?.username}! ⚡`);
+  }
+}
 ```
 
 And in Python:
 ```python
-from rift import Client
-client = Client(token=os.environ["DISCORD_TOKEN"])
-@client.on("message_create")
-async def on_message(msg):
-    if msg.content == "!ping": await msg.reply("Pong!")
+import asyncio
+from rift import RiftClient, Intents
+async def main():
+    client = RiftClient(os.environ["DISCORD_TOKEN"], intents=Intents.GUILDS | Intents.GUILD_MESSAGES)
+    while True:
+        event = await client.next_event()
+        if event is None: break
+        if event.name == "MESSAGE_CREATE" and event.data.get("content") == "!ping":
+            print(f"Pong from {event.data['author']['username']}! ⚡")
+asyncio.run(main())
 ```
 
 ### Why Another Discord Library?
-Existing JS and Python solutions struggle at large guild scale (100k+ servers), often consuming gigabytes of memory and dropping heartbeat intervals during event surges. Serenity and Twilight in Rust are great, but are Rust-only and have steep learning curves. Rift combines the performance of systems code with the ergonomics of modern scripting runtimes.
+Existing JS and Python solutions struggle under high event load, often accumulating garbage collection pressure and dropping heartbeat intervals during event surges. Rift combines the performance of a zero-unsafe Rust engine with the ergonomics of modern scripting runtimes.
 
 We also built an official Model Context Protocol (MCP) server ready to deploy serverless on Cloudflare Workers so AI agents (Claude, Cursor, Antigravity) can generate and audit type-safe Discord bots with live OpenAPI route validation.
 

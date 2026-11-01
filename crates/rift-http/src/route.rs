@@ -21,16 +21,47 @@ impl Route {
     /// Normalize `method` + `path` (a query string is ignored).
     pub fn new(method: &str, path: &str) -> Self {
         let path = path.split('?').next().unwrap_or("");
-        let segs: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+        
+        let mut seg_stack = [""; 16];
+        let mut seg_vec = Vec::new();
+        let mut seg_count = 0;
+        
+        for s in path.split('/') {
+            if !s.is_empty() {
+                if seg_count < 16 {
+                    seg_stack[seg_count] = s;
+                } else if seg_count == 16 {
+                    seg_vec.extend_from_slice(&seg_stack);
+                    seg_vec.push(s);
+                } else {
+                    seg_vec.push(s);
+                }
+                seg_count += 1;
+            }
+        }
+        let segs: &[&str] = if seg_count <= 16 {
+            &seg_stack[..seg_count]
+        } else {
+            &seg_vec
+        };
 
         // Interaction endpoints are exempt from the global limit and carry a
         // per-interaction token, which must not leak into the route key.
         if segs.first() == Some(&"interactions") {
-            let rest: String = segs.iter().skip(3).map(|s| format!("/{s}")).collect();
-            let template = format!("/interactions/:id/:token{rest}");
-            let method = method.to_ascii_uppercase();
+            let mut template = String::with_capacity(32 + path.len());
+            template.push_str("/interactions/:id/:token");
+            for s in segs.iter().skip(3) {
+                template.push('/');
+                template.push_str(s);
+            }
+            let mut id = String::with_capacity(method.len() + 1 + template.len());
+            for b in method.bytes() {
+                id.push(b.to_ascii_uppercase() as char);
+            }
+            id.push(' ');
+            id.push_str(&template);
             return Self {
-                id: format!("{method} {template}"),
+                id,
                 template,
                 major: "interactions".to_owned(),
                 webhook: None,
@@ -39,46 +70,62 @@ impl Route {
             };
         }
 
-        let mut out: Vec<String> = Vec::with_capacity(segs.len());
+        let mut template = String::with_capacity(path.len() + 16);
         let mut major = String::new();
         let mut webhook = None;
         let mut i = 0;
         while i < segs.len() {
             let s = segs[i];
             let prev = if i > 0 { segs[i - 1] } else { "" };
+            template.push('/');
             if is_snowflake(s) && (prev == "channels" || prev == "guilds") {
                 if major.is_empty() {
-                    major = format!("{prev}/{s}");
+                    major.reserve(prev.len() + 1 + s.len());
+                    major.push_str(prev);
+                    major.push('/');
+                    major.push_str(s);
                 }
-                out.push(":major".to_owned());
+                template.push_str(":major");
             } else if is_snowflake(s) && prev == "webhooks" {
-                let mut m = format!("webhooks/{s}");
-                if let Some(token) = segs.get(i + 1) {
+                let token = segs.get(i + 1).copied();
+                let mut m = String::with_capacity(9 + s.len() + token.map_or(0, |t| 1 + t.len()));
+                m.push_str("webhooks/");
+                m.push_str(s);
+                if let Some(tok) = token {
                     m.push('/');
-                    m.push_str(token);
-                    i += 1; // the token is part of the major key, not the template
+                    m.push_str(tok);
+                    i += 1;
                 }
                 if major.is_empty() {
                     major = m.clone();
                 }
                 webhook = Some(m);
-                out.push(":major".to_owned());
+                template.push_str(":major");
             } else if is_snowflake(s) {
-                out.push(":id".to_owned());
+                template.push_str(":id");
             } else if prev == "reactions" {
-                out.push(":emoji".to_owned());
+                template.push_str(":emoji");
             } else if prev == "invites" {
-                out.push(":code".to_owned());
+                template.push_str(":code");
             } else {
-                out.push(s.to_owned());
+                template.push_str(s);
             }
             i += 1;
         }
 
-        let template = format!("/{}", out.join("/"));
-        let method = method.to_ascii_uppercase();
+        let mut id = String::with_capacity(method.len() + 1 + template.len());
+        if method.bytes().all(|b| b.is_ascii_uppercase()) {
+            id.push_str(method);
+        } else {
+            for b in method.bytes() {
+                id.push(b.to_ascii_uppercase() as char);
+            }
+        }
+        id.push(' ');
+        id.push_str(&template);
+
         Self {
-            id: format!("{method} {template}"),
+            id,
             template,
             major,
             webhook,

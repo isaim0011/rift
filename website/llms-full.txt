@@ -18,79 +18,80 @@ use rift::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::builder("BOT_TOKEN")
-        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES)
-        .build()?;
+    let client = Client::builder(
+        std::env::var("DISCORD_TOKEN")?,
+        Intents::GUILDS | Intents::GUILD_MESSAGES,
+    )
+    .build()
+    .await?;
 
-    let mut events = client.events();
-    tokio::spawn(async move {
-        client.start().await.unwrap();
-    });
+    let router = CommandRouter::new()
+        .slash("ping", "Check bot latency", |ctx| async move {
+            ctx.reply("Pong from Rift! ⚡").await?;
+            Ok(())
+        });
 
-    while let Some(event) = events.recv().await {
-        match event {
-            Event::MessageCreate(msg) => {
-                if msg.content == "!ping" {
-                    println!("Ping received from {}", msg.author.username);
-                }
-            }
-            _ => {}
-        }
-    }
+    let mut framework = Framework::new(client, router);
+    framework.run().await?;
     Ok(())
 }
 ```
 
 ### TypeScript / Node.js & Bun
 ```typescript
-import { Client, GatewayIntents } from 'rift-discord';
+import { RiftClient, Intents } from 'rift-discord';
 
-const client = new Client({
-  token: process.env.DISCORD_TOKEN!,
-  intents: GatewayIntents.Guilds | GatewayIntents.GuildMessages,
-});
+const client = new RiftClient(
+  process.env.DISCORD_TOKEN!,
+  Intents.GUILDS | Intents.GUILD_MESSAGES
+);
 
-client.on('ready', (user) => {
-  console.log(`Connected as ${user.username}`);
-});
-
-client.on('messageCreate', async (message) => {
-  if (message.content === '!ping') {
-    await message.reply('Pong from Rift! ⚡');
+console.log('Rift bot connecting...');
+while (true) {
+  const event = await client.nextEvent();
+  if (!event) break;
+  if (event.name === 'MESSAGE_CREATE') {
+    if (event.data?.content === '!ping') {
+      console.log(`Pong from ${event.data.author?.username ?? 'user'}! ⚡`);
+    }
   }
-});
-
-await client.login();
+}
 ```
 
 ### Python
 ```python
 import os
 import asyncio
-from rift import Client, Intents
+from rift import RiftClient, Intents
 
-client = Client(
-    token=os.environ["DISCORD_TOKEN"],
-    intents=Intents.GUILDS | Intents.GUILD_MESSAGES
-)
+async def main():
+    client = RiftClient(
+        os.environ["DISCORD_TOKEN"],
+        intents=Intents.GUILDS | Intents.GUILD_MESSAGES,
+    )
+    print("Rift bot connecting...")
+    while True:
+        event = await client.next_event()
+        if event is None:
+            break
+        if event.name == "MESSAGE_CREATE":
+            if event.data.get("content") == "!ping":
+                author = event.data.get("author", {}).get("username", "user")
+                print(f"Pong from {author}! ⚡")
 
-@client.on("ready")
-def on_ready(user):
-    print(f"Logged in as {user.username}")
-
-@client.on("message_create")
-async def on_message(message):
-    if message.content == "!ping":
-        await message.reply("Pong from Rift! ⚡")
-
-asyncio.run(client.start())
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ## 4. Performance Benchmarks
-- **Gateway Dispatch Throughput**: 820,000 events/sec (vs Discord.js: 85,000 / Discord.py: 62,000)
-- **Memory Footprint (100k guilds)**: 42 MB (vs Discord.js: 490 MB / Discord.py: 380 MB)
-- **REST Request P99 Latency**: 1.2 ms (vs Discord.js: 8.4 ms / Discord.py: 11.1 ms)
-- **Cold Boot Time**: <15 ms (vs Node.js: 280 ms / Python: 340 ms)
+Measured via `rift-bench` on local loopback (Intel Core i5-6200U @ 2.30GHz, Windows 10, 10,000 Gateway v10 events with stateful zstd-stream):
+- **Tier 1 (Raw Driver Ingestion)**: 171,226 events/sec (p50: 3.40 µs, p95: 17.20 µs, p99: 23.60 µs)
+- **Tier 2 (Typed Model Parsing)**: 80,383 events/sec (p50: 10.30 µs, p95: 15.00 µs, p99: 36.60 µs)
+- **Tier 3 (Full Stack with State Cache + Permissions + Routing)**: 96,981 events/sec (best of 4 runs: 99,288 events/sec, p50: 7.70 µs, p99: 24.90 µs)
+- **Live Node.js v24 Baseline**: 37,301 events/sec (p50: 9.70 µs, p99: 54.50 µs)
+- **Live Python 3.14 Baseline**: 6,196 events/sec (p50: 95.60 µs, p99: 570.10 µs)
+- **Wire Compression**: 19.5x (7.6 MB raw -> 0.4 MB compressed via zstd-stream)
+- **State Cache Overhead**: Bounded FIFO O(50) (~120 KB per active shard)
 
 ## 5. Model Context Protocol (MCP) Integration
 Rift provides a dedicated AI Agent MCP Server at `https://rift-mcp.i-s41m0011.workers.dev/` supporting:

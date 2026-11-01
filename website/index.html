@@ -7,7 +7,7 @@
   
   <!-- Primary Meta Tags -->
   <meta name="title" content="Rift — The High-Performance Discord Engine (Rust, Node, Bun, Python)">
-  <meta name="description" content="Rift is an ultra-fast, zero-unsafe, sans-I/O Discord v10 architecture built in Rust with native zero-overhead bindings for TypeScript/Node.js, Bun, and Python. 10x faster than discord.js with 1/10th the memory.">
+  <meta name="description" content="Rift is an ultra-fast, zero-unsafe, sans-I/O Discord v10 architecture built in Rust with native zero-overhead bindings for TypeScript/Node.js, Bun, and Python. Measured at 82.8k ev/s full stack (235k raw) on local loopback.">
   <meta name="keywords" content="discord bot, discord library, rust discord, discord.js alternative, discord.py alternative, sans-io, zero unsafe, discord api v10, bun discord, high performance bot">
   <meta name="author" content="isaim0011">
   <link rel="canonical" href="https://rift-discord.pages.dev/">
@@ -17,7 +17,7 @@
   <meta property="og:url" content="https://rift-discord.pages.dev/">
   <meta property="og:site_name" content="Rift Discord Engine">
   <meta property="og:title" content="Rift — The High-Performance Discord Engine">
-  <meta property="og:description" content="Zero unsafe, 100% sans-I/O Discord v10 library in Rust with native Node.js, Bun, and Python bindings. 820,000 events/sec, 42MB at 100k guilds.">
+  <meta property="og:description" content="Zero unsafe, 100% sans-I/O Discord v10 library in Rust with native Node.js, Bun, and Python bindings. Measured at 82.8k ev/s full stack (235k raw) on local loopback.">
   <meta property="og:image" content="https://rift-discord.pages.dev/og-banner.png">
 
   <!-- Twitter -->
@@ -63,7 +63,7 @@
             "name": "What makes Rift faster than Discord.js and Discord.py?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Rift is engineered in zero-unsafe Rust with a pure sans-I/O state machine and SIMD-accelerated zero-copy JSON parsing. It processes up to 820,000 gateway events per second and uses under 42 MB of RAM for 100,000 cached guilds."
+              "text": "Rift is engineered in zero-unsafe Rust with a pure sans-I/O state machine and SIMD-accelerated zero-copy JSON parsing. In measured rift-bench runs on an Intel Core i5-6200U, Rift delivers 171,226 events/sec raw driver throughput (3.40 µs p50) and 96,981 events/sec full-stack ingestion with bounded state caching, outperforming live Node.js (37,301 ev/s) and Python (6,196 ev/s)."
             }
           },
           {
@@ -697,220 +697,111 @@
 
     <!-- Benchmarks -->
     <section id="benchmarks" class="benchmark-section">
-      <div class="env-badge">
-        <span>⚡ Hardware Benchmark Verified:</span>
-        <strong>Intel Core i5-6200U @ 2.30GHz &bull; Windows 10 &bull; 10,000 Gateway v10 Loopback Events</strong>
-      </div>
-      
-      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">Authentic, Reproducible Benchmarks</h2>
-      <p style="color: var(--text-muted); margin-bottom: 2rem;">Scientifically measured via <code style="color: #c7d2fe;">rift-bench</code> on local loopback with stateful <code style="color: #c7d2fe;">zstd-stream</code> compression and real live runtimes.</p>
-
+      <div class="env-badge"><span>Measured on:</span><strong>Intel Core i5-6200U @ 2.30GHz (2C/4T) &bull; Windows 10 &bull; release build &bull; loopback &bull; idle machine</strong></div>
+      <h2 style="font-size:2rem;font-weight:700;margin-bottom:0.5rem;">Real, Reproducible Benchmarks</h2>
+      <p style="color:var(--text-muted);margin-bottom:1rem;">Every number below was produced by <code style="color:#c7d2fe;">rift-bench</code> on a low-power laptop CPU. Throughput is the median of 3 runs of 10,000 gateway events; latencies are from the median run. Run-to-run noise on this machine is large (see ranges). Faster hardware will score higher for every library.</p>
       <div class="bench-tabs">
-        <button class="bench-tab active" onclick="switchBench('throughput', this)">1. Pipeline Throughput &amp; Latency</button>
-        <button class="bench-tab" onclick="switchBench('micro', this)">2. Micro-Operation Speedups (ns)</button>
-        <button class="bench-tab" onclick="switchBench('harness', this)">3. 5-Run Ingestion Stability</button>
+        <button class="bench-tab active" onclick="switchBench('throughput', this)">1. Rift vs Node &amp; Python</button>
+        <button class="bench-tab" onclick="switchBench('rivals', this)">2. Rift vs Twilight &amp; Serenity</button>
+        <button class="bench-tab" onclick="switchBench('micro', this)">3. Micro-operations</button>
+        <button class="bench-tab" onclick="switchBench('harness', this)">4. Ingestion stability</button>
       </div>
-
-      <!-- Tab 1: Pipeline Throughput -->
       <div id="bench-view-throughput" class="bench-view active">
         <div class="benchmark-bar-row">
-          <div class="benchmark-header">
-            <strong>Tier 1: Rift Raw Driver <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(sans-I/O + zstd-stream)</span></strong>
-            <span style="color: #818cf8; font-weight: 700;">235,056 ev/s <span style="color: #34d399; font-size: 0.8rem;">(6.2x faster)</span></span>
-          </div>
-          <div class="bar-wrapper">
-            <div class="bar-fill rift-raw">235,056 ev/s</div>
-          </div>
-          <div class="benchmark-metrics">
-            <span>p50: <strong>3.20 μs</strong></span>
-            <span>p95: <strong>5.00 μs</strong></span>
-            <span>p99: <strong>20.20 μs</strong></span>
-            <span>Wire Compression: <strong>19.5x (7.6 MB → 0.4 MB)</strong></span>
-            <span>State Memory: <strong>Stateless Driver</strong></span>
-          </div>
+          <div class="benchmark-header"><strong>Rift Raw Driver <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(no payload parsing)</span></strong><span style="font-weight:700;">171,226 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill rift-raw" style="width:100%;">171,226 ev/s</div></div>
+          <div class="benchmark-metrics"><span>range 168k&ndash;175k</span><span>p50 3.40 &micro;s</span><span>p99 23.60 &micro;s</span><span>wire 19.5x smaller (zstd-stream)</span></div>
         </div>
-
         <div class="benchmark-bar-row">
-          <div class="benchmark-header">
-            <strong>Tier 2: Rift Typed Model <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(zero-copy parsed structures)</span></strong>
-            <span style="color: #818cf8; font-weight: 700;">113,620 ev/s <span style="color: #34d399; font-size: 0.8rem;">(3.0x faster)</span></span>
-          </div>
-          <div class="bar-wrapper">
-            <div class="bar-fill rift-typed">113,620 ev/s</div>
-          </div>
-          <div class="benchmark-metrics">
-            <span>p50: <strong>7.00 μs</strong></span>
-            <span>p95: <strong>9.60 μs</strong></span>
-            <span>p99: <strong>13.90 μs</strong></span>
-            <span>Wire Compression: <strong>19.5x</strong></span>
-            <span>State Memory: <strong>Stack-Allocated</strong></span>
-          </div>
+          <div class="benchmark-header"><strong>Rift Typed Model <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(typed events)</span></strong><span style="font-weight:700;">80,383 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill rift-typed" style="width:46.9%;">80,383 ev/s</div></div>
+          <div class="benchmark-metrics"><span>range 28k&ndash;139k (noisy)</span><span>p50 10.30 &micro;s</span><span>p99 36.60 &micro;s</span></div>
         </div>
-
         <div class="benchmark-bar-row">
-          <div class="benchmark-header">
-            <strong>Tier 3: Rift Full Stack <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(State Cache + Permissions + Routes)</span></strong>
-            <span style="color: #60a5fa; font-weight: 700;">82,818 ev/s <span style="color: #34d399; font-size: 0.8rem;">(Peak: 110,963 ev/s)</span></span>
-          </div>
-          <div class="bar-wrapper">
-            <div class="bar-fill rift-full">82,818 ev/s</div>
-          </div>
-          <div class="benchmark-metrics">
-            <span>p50: <strong>10.00 μs</strong></span>
-            <span>p95: <strong>16.90 μs</strong></span>
-            <span>p99: <strong>28.20 μs</strong></span>
-            <span>Wire Compression: <strong>19.5x</strong></span>
-            <span>State Memory: <strong>Bounded O(50) (~120 KB)</strong></span>
-          </div>
+          <div class="benchmark-header"><strong>Rift Full Stack <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(typed + cache + permissions + routes)</span></strong><span style="font-weight:700;">96,981 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill rift-full" style="width:56.6%;">96,981 ev/s</div></div>
+          <div class="benchmark-metrics"><span>range 83k&ndash;99k (4 runs)</span><span>p50 7.70 &micro;s</span><span>p99 24.90 &micro;s</span><span>cache memory ~120 KB, bounded</span></div>
         </div>
-
         <div class="benchmark-bar-row">
-          <div class="benchmark-header">
-            <strong>Live Node.js v24.21.0 <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(V8 / discord.js equivalent)</span></strong>
-            <span style="color: var(--text-muted);">43,289 ev/s (1.9x slower)</span>
-          </div>
-          <div class="bar-wrapper">
-            <div class="bar-fill node">43,289 ev/s</div>
-          </div>
-          <div class="benchmark-metrics">
-            <span>p50: <strong>9.70 μs</strong></span>
-            <span>p95: <strong>24.40 μs</strong></span>
-            <span>p99: <strong>54.50 μs</strong></span>
-            <span>Wire Compression: <strong>1.0x (7.6 MB raw)</strong></span>
-            <span>State Memory: <strong>Heap GC (~22.8 MB)</strong></span>
-          </div>
+          <div class="benchmark-header"><strong>Node.js v24.21.0 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(V8, simulated discord.js-style handler)</span></strong><span style="font-weight:700;">37,301 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill node" style="width:21.8%;">37,301 ev/s</div></div>
+          <div class="benchmark-metrics"><span>range 37k&ndash;41k</span><span>p50 10.50 &micro;s</span><span>p99 54.20 &micro;s</span><span>heap ~22.7 MB</span></div>
         </div>
-
         <div class="benchmark-bar-row">
-          <div class="benchmark-header">
-            <strong>Live Python 3.14.7 <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(CPython / discord.py equivalent)</span></strong>
-            <span style="color: var(--text-muted);">5,675 ev/s (14.6x – 41.4x slower)</span>
-          </div>
-          <div class="bar-wrapper">
-            <div class="bar-fill python">5.6k/s</div>
-          </div>
-          <div class="benchmark-metrics">
-            <span>p50: <strong>95.60 μs</strong></span>
-            <span>p95: <strong>261.80 μs</strong></span>
-            <span>p99: <strong>570.10 μs</strong></span>
-            <span>Wire Compression: <strong>1.0x (7.6 MB raw)</strong></span>
-            <span>State Memory: <strong>Dict Graphs (~34.3 MB)</strong></span>
-          </div>
+          <div class="benchmark-header"><strong>Python 3.14.7 <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(CPython, simulated discord.py-style handler)</span></strong><span style="font-weight:700;">6,196 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill python" style="width:3.6%;">6,196 ev/s</div></div>
+          <div class="benchmark-metrics"><span>range 5.3k&ndash;6.6k</span><span>p50 92.60 &micro;s</span><span>p99 495.90 &micro;s</span><span>memory ~34.3 MB</span></div>
         </div>
+        <p style="color:var(--text-muted);font-size:0.8rem;margin-top:1rem;">Node and Python rows run the real interpreters with a hand-written handler on the same mock gateway; they are not the discord.js or discord.py packages themselves. The Full Stack tier does extra work (cache, permissions, routes) that the Node/Python handlers do not, so it is not a like-for-like comparison.</p>
       </div>
-
-      <!-- Tab 2: Micro-Operation Speedups -->
+      <div id="bench-view-rivals" class="bench-view">
+        <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1rem;">Head-to-head on the same mock gateway and 10,000 frames (1 warm-up + median of 5 runs). <code>twilight-gateway</code> / <code>twilight-model</code> 0.17.1, <code>serenity</code> 0.12.5.</p>
+        <h3 style="font-size:1rem;margin:1rem 0 0.75rem;">End-to-end (WebSocket + zstd-stream)</h3>
+        <div class="benchmark-bar-row">
+          <div class="benchmark-header"><strong>Twilight Raw Driver <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(unparsed frames)</span></strong><span style="font-weight:700;">313,406 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill rift-full" style="width:100%;">313,406 ev/s</div></div>
+          <div class="benchmark-metrics"><span>p50 2.50 &micro;s</span><span>p99 13.10 &micro;s</span></div>
+        </div>
+        <div class="benchmark-bar-row">
+          <div class="benchmark-header"><strong>Rift Raw Driver <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(unparsed frames)</span></strong><span style="font-weight:700;">175,843 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill rift-raw" style="width:56.1%;">175,843 ev/s</div></div>
+          <div class="benchmark-metrics"><span>p50 3.50 &micro;s</span><span>p99 24.40 &micro;s</span><span>Twilight is ~1.8x faster here</span></div>
+        </div>
+        <div class="benchmark-bar-row">
+          <div class="benchmark-header"><strong>Rift Typed <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(typed events)</span></strong><span style="font-weight:700;">147,108 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill rift-typed" style="width:46.9%;">147,108 ev/s</div></div>
+          <div class="benchmark-metrics"><span>p50 5.50 &micro;s</span><span>p99 14.80 &micro;s</span><span>~1.7x faster than Twilight Typed</span></div>
+        </div>
+        <div class="benchmark-bar-row">
+          <div class="benchmark-header"><strong>Twilight Typed <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(typed events)</span></strong><span style="font-weight:700;">87,802 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill node" style="width:28%;">87,802 ev/s</div></div>
+          <div class="benchmark-metrics"><span>p50 9.60 &micro;s</span><span>p99 35.60 &micro;s</span></div>
+        </div>
+        <h3 style="font-size:1rem;margin:1.5rem 0 0.75rem;">Parse-only (in-memory deserialization of identical frames)</h3>
+        <div class="benchmark-bar-row">
+          <div class="benchmark-header"><strong>Rift Model <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;"></span></strong><span style="font-weight:700;">175,084 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill rift-typed" style="width:55.9%;">175,084 ev/s</div></div>
+          <div class="benchmark-metrics"><span>p50 5.20 &micro;s</span><span>p99 19.70 &micro;s</span></div>
+        </div>
+        <div class="benchmark-bar-row">
+          <div class="benchmark-header"><strong>Twilight Model <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;"></span></strong><span style="font-weight:700;">116,767 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill node" style="width:37.3%;">116,767 ev/s</div></div>
+          <div class="benchmark-metrics"><span>p50 7.10 &micro;s</span><span>p99 26.20 &micro;s</span><span>Rift ~1.5x faster</span></div>
+        </div>
+        <div class="benchmark-bar-row">
+          <div class="benchmark-header"><strong>Serenity Model <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(parse-only, not end-to-end)</span></strong><span style="font-weight:700;">85,174 ev/s</span></div>
+          <div class="bar-wrapper"><div class="bar-fill python" style="width:27.2%;">85,174 ev/s</div></div>
+          <div class="benchmark-metrics"><span>p50 10.60 &micro;s</span><span>p99 29.50 &micro;s</span><span>Rift ~2.1x faster</span></div>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.8rem;margin-top:1rem;">Serenity cannot be pointed at a local mock gateway (it hardcodes Discord's HTTPS gateway discovery), so it is measured on model parsing only. Twilight's raw driver is faster than Rift's; Rift's advantage is in typed parsing. Reproduce: <code>cargo run --release --manifest-path crates/rift-bench-rivals/Cargo.toml -- --events 10000 --runs 5</code></p>
+      </div>
       <div id="bench-view-micro" class="bench-view">
-        <div class="bench-table-container">
-          <table class="bench-table">
-            <thead>
-              <tr>
-                <th>Operation</th>
-                <th>Rift (Safe Rust)</th>
-                <th>Dynamic Baseline (Node/Py)</th>
-                <th>Measured Speedup</th>
-                <th>Architectural Mechanism</th>
-              </tr>
-            </thead>
+        <div class="bench-table-container"><table class="bench-table">
+            <thead><tr><th>Operation</th><th>Rift (safe Rust)</th><th>Dynamic baseline (Node/Py)</th><th>Ratio</th><th>Mechanism</th></tr></thead>
             <tbody>
-              <tr>
-                <td><strong>52-bit Permission Math</strong></td>
-                <td style="color: #818cf8; font-weight: 600;">0.5 ns</td>
-                <td>59.5 ns</td>
-                <td class="bench-highlight">119.0x faster</td>
-                <td>Single-cycle u64 bitwise calculation vs string array accumulation</td>
-              </tr>
-              <tr>
-                <td><strong>Frame Envelope &amp; Filter</strong></td>
-                <td style="color: #818cf8; font-weight: 600;">1.47 μs</td>
-                <td>20.48 μs</td>
-                <td class="bench-highlight">13.9x faster</td>
-                <td>Zero-copy raw byte envelope scan vs eager AST JSON parsing</td>
-              </tr>
-              <tr>
-                <td><strong>Ed25519 Interaction Verification</strong></td>
-                <td style="color: #818cf8; font-weight: 600;">53.38 μs</td>
-                <td>181.49 μs</td>
-                <td class="bench-highlight">3.4x faster</td>
-                <td>SIMD-accelerated ed25519-dalek vs WebCrypto V8 boundary</td>
-              </tr>
-              <tr>
-                <td><strong>Snowflake ID Decode</strong></td>
-                <td style="color: #818cf8; font-weight: 600;">0.7 ns</td>
-                <td>2.2 ns</td>
-                <td class="bench-highlight">3.0x faster</td>
-                <td>Direct u64 bitshift vs JavaScript BigInt / String parsing</td>
-              </tr>
-              <tr>
-                <td><strong>REST Route Normalization</strong></td>
-                <td style="color: #818cf8; font-weight: 600;">6.71 μs</td>
-                <td>1.59 μs</td>
-                <td>Stack Compile-time</td>
-                <td>Zero-regex stack scan preserving strict OpenAPI parameters</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              <tr><td><strong>52-bit permission math</strong></td><td>0.5 ns</td><td>53.4 ns</td><td>106.8x</td><td>u64 bitwise vs string-array accumulation</td></tr>
+              <tr><td><strong>Frame filter &amp; dispatch</strong></td><td>1.27 &micro;s</td><td>14.02 &micro;s</td><td>11.0x</td><td>raw byte envelope scan vs eager JSON parse</td></tr>
+              <tr><td><strong>Ed25519 verification</strong></td><td>59.71 &micro;s</td><td>203.03 &micro;s</td><td>3.4x</td><td>ed25519-dalek vs WebCrypto</td></tr>
+              <tr><td><strong>Snowflake decode</strong></td><td>0.7 ns</td><td>2.2 ns</td><td>3.0x</td><td>u64 bitshift vs BigInt/string parse</td></tr>
+              <tr><td><strong>REST route normalization</strong></td><td>1.13 &micro;s</td><td>1.31 &micro;s</td><td>1.2x</td><td>allocation-light scan vs RegExp chain</td></tr>
+            </tbody></table></div>
       </div>
-
-      <!-- Tab 3: 5-Iteration Ingestion Stability -->
       <div id="bench-view-harness" class="bench-view">
-        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
-          Results across 5 measured iterations &times; 5,000 events end-to-end (Loopback WebSocket &rarr; zstd-stream decompress &rarr; envelope parse &rarr; typed GatewayEvent &rarr; Cache update). Warm-up run discarded.
-        </p>
-        <div class="bench-table-container">
-          <table class="bench-table">
-            <thead>
-              <tr>
-                <th>Measured Metric</th>
-                <th>Minimum</th>
-                <th>Median (P50)</th>
-                <th>Maximum (Peak)</th>
-              </tr>
-            </thead>
+        <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1rem;">5 measured iterations &times; 5,000 events (warm-up discarded): WebSocket &rarr; zstd-stream &rarr; envelope &rarr; typed event &rarr; cache.</p>
+        <div class="bench-table-container"><table class="bench-table">
+            <thead><tr><th>Metric</th><th>Min</th><th>Median</th><th>Max</th><th></th></tr></thead>
             <tbody>
-              <tr>
-                <td><strong>Gateway Events / Second</strong></td>
-                <td>81,364 ev/s</td>
-                <td class="bench-highlight">94,959 ev/s</td>
-                <td style="color: #818cf8; font-weight: 700;">110,963 ev/s</td>
-              </tr>
-              <tr>
-                <td><strong>p50 Ingestion Latency</strong></td>
-                <td>7.30 μs</td>
-                <td class="bench-highlight">7.60 μs</td>
-                <td>10.40 μs</td>
-              </tr>
-              <tr>
-                <td><strong>p99 Ingestion Latency</strong></td>
-                <td>24.00 μs</td>
-                <td class="bench-highlight">27.20 μs</td>
-                <td>28.40 μs</td>
-              </tr>
-              <tr>
-                <td><strong>Time to READY (Auth + Shard Handshake)</strong></td>
-                <td>101.23 ms</td>
-                <td class="bench-highlight">159.41 ms</td>
-                <td>209.23 ms</td>
-              </tr>
-              <tr>
-                <td><strong>CPU Time / 1,000 Events</strong></td>
-                <td>34.38 ms</td>
-                <td class="bench-highlight">46.88 ms</td>
-                <td>50.00 ms</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              <tr><td><strong>Events / second</strong></td><td>77,852</td><td>96,219</td><td>105,834</td><td></td></tr>
+              <tr><td><strong>p50 latency</strong></td><td>7.30 &micro;s</td><td>7.80 &micro;s</td><td>11.10 &micro;s</td><td></td></tr>
+              <tr><td><strong>p99 latency</strong></td><td>25.60 &micro;s</td><td>30.10 &micro;s</td><td>38.50 &micro;s</td><td></td></tr>
+              <tr><td><strong>Time to READY</strong></td><td>103.15 ms</td><td>157.37 ms</td><td>180.99 ms</td><td></td></tr>
+              <tr><td><strong>CPU / 1,000 events</strong></td><td>37.50 ms</td><td>50.00 ms</td><td>53.12 ms</td><td></td></tr>
+            </tbody></table></div>
       </div>
-
-      <!-- Reproducibility Box -->
       <div class="reproduce-box">
-        <div>
-          <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem;">Verify On Your Own Hardware</div>
-          <div class="reproduce-code" id="reproduce-cmd">cargo run --release -p rift-bench --example compare</div>
-        </div>
-        <button class="copy-btn" onclick="copyReproduce()">Copy Benchmark Command</button>
+        <div><div style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">Verify on your own hardware</div>
+        <div class="reproduce-code" id="reproduce-cmd">cargo run --release -p rift-bench --example compare</div></div>
+        <button class="copy-btn" onclick="copyReproduce()">Copy command</button>
       </div>
     </section>
 
@@ -933,22 +824,21 @@ use rift::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    let client = Client::builder(std::env::var("DISCORD_TOKEN")?)
-        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES)
-        .build()?;
+    let client = Client::builder(
+        std::env::var("DISCORD_TOKEN")?,
+        Intents::GUILDS | Intents::GUILD_MESSAGES,
+    )
+    .build()
+    .await?;
 
-    let mut events = client.events();
-    tokio::spawn(async move {
-        client.start().await.unwrap();
-    });
+    let router = CommandRouter::new()
+        .slash("ping", "Check bot latency", |ctx| async move {
+            ctx.reply("Pong from Rift! ⚡").await?;
+            Ok(())
+        });
 
-    while let Some(event) = events.recv().await {
-        if let Event::MessageCreate(msg) = event {
-            if msg.content == "!ping" {
-                println!("Pong received from {}", msg.author.username);
-            }
-        }
-    }
+    let mut framework = Framework::new(client, router);
+    framework.run().await?;
     Ok(())
 }</code></pre>
       </div>
@@ -1002,69 +892,69 @@ use rift::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::builder(std::env::var("DISCORD_TOKEN")?)
-        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES)
-        .build()?;
+    let client = Client::builder(
+        std::env::var("DISCORD_TOKEN")?,
+        Intents::GUILDS | Intents::GUILD_MESSAGES,
+    )
+    .build()
+    .await?;
 
-    let mut events = client.events();
-    tokio::spawn(async move {
-        client.start().await.unwrap();
-    });
+    let router = CommandRouter::new()
+        .slash("ping", "Check bot latency", |ctx| async move {
+            ctx.reply("Pong from Rift! ⚡").await?;
+            Ok(())
+        });
 
-    while let Some(event) = events.recv().await {
-        if let Event::MessageCreate(msg) = event {
-            if msg.content == "!ping" {
-                println!("Pong received from {}", msg.author.username);
-            }
-        }
-    }
+    let mut framework = Framework::new(client, router);
+    framework.run().await?;
     Ok(())
 }`
       },
       ts: {
         file: 'index.ts',
         code: `// TypeScript / Node.js & Bun (index.ts)
-import { Client, GatewayIntents } from 'rift-discord';
+import { RiftClient, Intents } from 'rift-discord';
 
-const client = new Client({
-  token: process.env.DISCORD_TOKEN!,
-  intents: GatewayIntents.Guilds | GatewayIntents.GuildMessages,
-});
+const client = new RiftClient(
+  process.env.DISCORD_TOKEN!,
+  Intents.GUILDS | Intents.GUILD_MESSAGES
+);
 
-client.on('ready', (user) => {
-  console.log(\`Logged in as \${user.username} via Rift Engine! ⚡\`);
-});
-
-client.on('messageCreate', async (message) => {
-  if (message.content === '!ping') {
-    await message.reply('Pong from Rift! ⚡');
+console.log('Rift bot connecting...');
+while (true) {
+  const event = await client.nextEvent();
+  if (!event) break;
+  if (event.name === 'MESSAGE_CREATE') {
+    if (event.data?.content === '!ping') {
+      console.log(\`Pong from \${event.data.author?.username ?? 'user'}! ⚡\`);
+    }
   }
-});
-
-await client.login();`
+}`
       },
       py: {
         file: 'main.py',
         code: `# Python (main.py)
 import os
 import asyncio
-from rift import Client, Intents
+from rift import RiftClient, Intents
 
-client = Client(
-    token=os.environ["DISCORD_TOKEN"],
-    intents=Intents.GUILDS | Intents.GUILD_MESSAGES
-)
+async def main():
+    client = RiftClient(
+        os.environ["DISCORD_TOKEN"],
+        intents=Intents.GUILDS | Intents.GUILD_MESSAGES,
+    )
+    print("Rift bot connecting...")
+    while True:
+        event = await client.next_event()
+        if event is None:
+            break
+        if event.name == "MESSAGE_CREATE":
+            if event.data.get("content") == "!ping":
+                author = event.data.get("author", {}).get("username", "user")
+                print(f"Pong from {author}! ⚡")
 
-@client.on("ready")
-def on_ready(user):
-    print(f"Logged in as {user.username} via Rift Engine! ⚡")
-
-@client.on("message_create")
-async def on_message(message):
-    if message.content == "!ping":
-        await message.reply("Pong from Rift! ⚡")
-
-asyncio.run(client.start())`
+if __name__ == "__main__":
+    asyncio.run(main())`
       }
     };
 

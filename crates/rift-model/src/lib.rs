@@ -246,10 +246,10 @@ impl GatewayEvent {
     /// Unknown event names do not produce an error; they parse into [`GatewayEvent::Unknown`].
     pub fn parse(name: &str, raw: &RawValue) -> Result<Self, serde_json::Error> {
         match name {
+            "MESSAGE_CREATE" => serde_json::from_str::<MessageCreate>(raw.get()).map(GatewayEvent::MessageCreate),
             "READY" => serde_json::from_str::<Ready>(raw.get()).map(GatewayEvent::Ready),
-            "RESUMED" => serde_json::from_str::<Resumed>(raw.get()).map(GatewayEvent::Resumed),
-
             "GUILD_CREATE" => serde_json::from_str::<GuildCreate>(raw.get()).map(GatewayEvent::GuildCreate),
+            "RESUMED" => serde_json::from_str::<Resumed>(raw.get()).map(GatewayEvent::Resumed),
             "GUILD_UPDATE" => serde_json::from_str::<GuildUpdate>(raw.get()).map(GatewayEvent::GuildUpdate),
             "GUILD_DELETE" => serde_json::from_str::<GuildDelete>(raw.get()).map(GatewayEvent::GuildDelete),
 
@@ -274,7 +274,6 @@ impl GatewayEvent {
             "GUILD_ROLE_UPDATE" => serde_json::from_str::<GuildRoleUpdate>(raw.get()).map(GatewayEvent::GuildRoleUpdate),
             "GUILD_ROLE_DELETE" => serde_json::from_str::<GuildRoleDelete>(raw.get()).map(GatewayEvent::GuildRoleDelete),
 
-            "MESSAGE_CREATE" => serde_json::from_str::<MessageCreate>(raw.get()).map(GatewayEvent::MessageCreate),
             "MESSAGE_UPDATE" => serde_json::from_str::<MessageUpdate>(raw.get()).map(GatewayEvent::MessageUpdate),
             "MESSAGE_DELETE" => serde_json::from_str::<MessageDelete>(raw.get()).map(GatewayEvent::MessageDelete),
             "MESSAGE_DELETE_BULK" => serde_json::from_str::<MessageDeleteBulk>(raw.get()).map(GatewayEvent::MessageDeleteBulk),
@@ -361,6 +360,7 @@ impl GatewayEvent {
     /// Parse a typed gateway event consuming a boxed raw JSON value.
     pub fn parse_boxed(name: String, raw: Box<RawValue>) -> Result<Self, serde_json::Error> {
         match name.as_str() {
+            "MESSAGE_CREATE" => serde_json::from_str::<MessageCreate>(raw.get()).map(GatewayEvent::MessageCreate),
             "READY" => serde_json::from_str::<Ready>(raw.get()).map(GatewayEvent::Ready),
             "RESUMED" => serde_json::from_str::<Resumed>(raw.get()).map(GatewayEvent::Resumed),
 
@@ -389,7 +389,6 @@ impl GatewayEvent {
             "GUILD_ROLE_UPDATE" => serde_json::from_str::<GuildRoleUpdate>(raw.get()).map(GatewayEvent::GuildRoleUpdate),
             "GUILD_ROLE_DELETE" => serde_json::from_str::<GuildRoleDelete>(raw.get()).map(GatewayEvent::GuildRoleDelete),
 
-            "MESSAGE_CREATE" => serde_json::from_str::<MessageCreate>(raw.get()).map(GatewayEvent::MessageCreate),
             "MESSAGE_UPDATE" => serde_json::from_str::<MessageUpdate>(raw.get()).map(GatewayEvent::MessageUpdate),
             "MESSAGE_DELETE" => serde_json::from_str::<MessageDelete>(raw.get()).map(GatewayEvent::MessageDelete),
             "MESSAGE_DELETE_BULK" => serde_json::from_str::<MessageDeleteBulk>(raw.get()).map(GatewayEvent::MessageDeleteBulk),

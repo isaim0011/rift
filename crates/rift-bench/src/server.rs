@@ -248,7 +248,7 @@ async fn handle_gateway_connection(
     // 3. Setup streaming with single long-lived zstd encoder flushed after every frame.
     let mut encoder = zstd::stream::write::Encoder::new(Vec::new(), config.zstd_level)?;
     let (mut ws_tx, mut ws_rx) = ws.split();
-    let (out_tx, mut out_rx) = mpsc::channel::<Message>(4096);
+    let (out_tx, mut out_rx) = mpsc::channel::<Message>(8192);
 
     let writer_task = tokio::spawn(async move {
         while let Some(msg) = out_rx.recv().await {
@@ -256,7 +256,7 @@ async fn handle_gateway_connection(
                 break;
             }
             let mut count = 1;
-            while count < 64 {
+            while count < 128 {
                 match out_rx.try_recv() {
                     Ok(next_msg) => {
                         if ws_tx.feed(next_msg).await.is_err() {
@@ -362,7 +362,7 @@ async fn handle_gateway_connection(
         if out_tx.send(msg).await.is_err() {
             return Ok(());
         }
-        stats.events_streamed.fetch_add(1, Ordering::SeqCst);
+        stats.events_streamed.fetch_add(1, Ordering::Relaxed);
     }
 
     // Keep serving heartbeats until client disconnects or shuts down.
